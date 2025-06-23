@@ -1,0 +1,57 @@
+spring:
+  messages:
+    encoding: UTF-8
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/cocktail-db?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC"
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASS:}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  sql:
+    init:
+      mode: never
+  jpa:
+    #    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+
+cloudinary:
+  api-key: ${CLAUDINARY_API_KEY:478985327646651}
+  api-secret: ${CLAUDINARY_API_SECRET:i3CwHZ9gUu8YYHzop8jqco6ErVY}
+  cloud-name: dlknl4mzd
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: aleksandramileva96@gmail.com
+  password: ${EMAIL_PASSWORD:keys jnos athx ocwl}
+
+site:
+  base:
+    url: http://localhost:8080
+
+fortuneservice:
+  base:
+    url: http://${FORTUNES_SERVICE_HOST:localhost}:8081/fortune-service
+
+home-page-cron: "0 0 0,16 * * ?"
+daily-report-cron: "0 0 0 * * ?"
+daily-deletion-cron: "0 0/16 * * * ?"
+
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.orm.jdbc.bind: TRACE
