@@ -1,4 +1,4 @@
-package com.example.cocktails.model.dto;
+package com.example.cocktails.model.dto.comment;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

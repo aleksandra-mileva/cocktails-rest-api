@@ -1,4 +1,4 @@
-package com.example.cocktails.model.dto;
+package com.example.cocktails.model.dto.cocktail;
 
 import com.example.cocktails.model.entity.enums.FlavourEnum;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;

@@ -5,26 +5,29 @@ spring:
   liquibase:
     enabled: false
 
-#cloudinary:
-#  api-key: key
-#  api-secret: secret
-#  cloud-name: dlknl4mzd
-#
-#mail:
-#  host: "localhost"
-#  port: 1025
-#  username: "craftyCocktails@craftyCocktails.com"
-#  password: "pass"
-#
-#
-#site:
-#  base:
-#    url: http://localhost:8080
-#
-#fortuneservice:
-#  base:
-#    url: http://localhost:8081/fortune-service
-#
-#home-page-cron: "0 0 0,16 * * ?"
-#daily-report-cron: "0 0 0 * * ?"
-#daily-deletion-cron: "0 0/16 * * * ?"
+cloudinary:
+  api-key: key
+  api-secret: secret
+  cloud-name: dlknl4mzd
+
+mail:
+  host: "localhost"
+  port: 1025
+  username: "craftyCocktails@craftyCocktails.com"
+  password: "pass"
+
+site:
+  base:
+    url: http://localhost:8080
+
+fortuneservice:
+  base:
+    url: http://localhost:8081/fortune-service
+
+jwt:
+  secret: topsecret
+  expiration: 60000
+
+home-page-cron: "0 0 0,16 * * ?"
+daily-report-cron: "0 0 0 * * ?"
+daily-deletion-cron: "0 0/16 * * * ?"

@@ -1,4 +1,4 @@
-package com.example.cocktails.model.dto;
+package com.example.cocktails.model.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

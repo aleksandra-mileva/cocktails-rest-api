@@ -21,29 +21,32 @@ spring:
       hibernate:
         format_sql: true
 
+cloudinary:
+  api-key: ${CLAUDINARY_API_KEY:478985327646651}
+  api-secret: ${CLAUDINARY_API_SECRET:i3CwHZ9gUu8YYHzop8jqco6ErVY}
+  cloud-name: dlknl4mzd
 
-#cloudinary:
-#  api-key: ${CLAUDINARY_API_KEY:478985327646651}
-#  api-secret: ${CLAUDINARY_API_SECRET:i3CwHZ9gUu8YYHzop8jqco6ErVY}
-#  cloud-name: dlknl4mzd
-#
-#mail:
-#  host: smtp.gmail.com
-#  port: 587
-#  username: aleksandramileva96@gmail.com
-#  password: ${EMAIL_PASSWORD:keys jnos athx ocwl}
-#
-#site:
-#  base:
-#    url: http://localhost:8080
-#
-#fortuneservice:
-#  base:
-#    url: http://${FORTUNES_SERVICE_HOST:localhost}:8081/fortune-service
-#
-#home-page-cron: "0 0 0,16 * * ?"
-#daily-report-cron: "0 0 0 * * ?"
-#daily-deletion-cron: "0 0/16 * * * ?"
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: aleksandramileva96@gmail.com
+  password: ${EMAIL_PASSWORD:keys jnos athx ocwl}
+
+site:
+  base:
+    url: http://localhost:8080
+
+fortuneservice:
+  base:
+    url: http://${FORTUNES_SERVICE_HOST:localhost}:8081/fortune-service
+
+jwt:
+  secret: ${JWT_KEY:WSdv1kEE1tCT1a8ihRSqfwMNzlPBq8IWSdv1kEE1tCT1a8ihRSqfwMNzlPBq8IWSdv1kEE1tCT1a8ihRSqfwMNzlPBq8I}
+  expiration: ${JWT_EXPIRATION:60000}
+
+home-page-cron: "0 0 0,16 * * ?"
+daily-report-cron: "0 0 0 * * ?"
+daily-deletion-cron: "0 0/16 * * * ?"
 
 logging:
   level:

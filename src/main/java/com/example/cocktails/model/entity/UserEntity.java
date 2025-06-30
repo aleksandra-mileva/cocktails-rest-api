@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -57,6 +58,13 @@ public class UserEntity extends BaseEntity {
 
   @OneToMany(mappedBy = "author")
   private List<PictureEntity> addedPictures;
+
+  public void addRole(RoleEntity role) {
+    if (this.roles == null) {
+      this.roles = new ArrayList<>();
+    }
+    this.roles.add(role);
+  }
 
   public String getUsername() {
     return username;

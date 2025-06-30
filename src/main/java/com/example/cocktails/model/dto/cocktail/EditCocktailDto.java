@@ -1,4 +1,4 @@
-package com.example.cocktails.model.dto;
+package com.example.cocktails.model.dto.cocktail;
 
 import com.example.cocktails.model.entity.enums.FlavourEnum;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
@@ -7,8 +7,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-
-import java.util.List;
 
 public record EditCocktailDto(
     Long id,

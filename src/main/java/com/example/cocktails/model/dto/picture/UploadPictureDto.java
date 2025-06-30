@@ -1,4 +1,4 @@
-package com.example.cocktails.model.dto;
+package com.example.cocktails.model.dto.picture;
 
 import org.springframework.web.multipart.MultipartFile;
 

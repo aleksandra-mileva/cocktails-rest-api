@@ -1,4 +1,4 @@
-package com.example.cocktails.model.dto;
+package com.example.cocktails.model.dto.fortune;
 
 import jakarta.validation.constraints.NotEmpty;
 

@@ -22,6 +22,10 @@ public class SecureTokenEntity extends BaseEntity {
   @ManyToOne
   private UserEntity user;
 
+  public boolean isExpired() {
+    return expireAt.isBefore(LocalDateTime.now());
+  }
+
   public String getToken() {
     return token;
   }

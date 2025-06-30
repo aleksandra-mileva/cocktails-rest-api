@@ -1,4 +1,4 @@
-package com.example.cocktails.model.dto.forgotten_password;
+package com.example.cocktails.model.dto.password;
 
 import com.example.cocktails.model.validation.FieldMatch;
 import jakarta.validation.constraints.NotEmpty;

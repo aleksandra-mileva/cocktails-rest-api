@@ -1,4 +1,4 @@
-package com.example.cocktails.model.dto;
+package com.example.cocktails.model.dto.user;
 
 import com.example.cocktails.model.validation.FieldMatch;
 import com.example.cocktails.model.validation.UniqueEmail;
@@ -28,6 +28,8 @@ public class UserRegisterDto {
   @NotEmpty(message = "Last name cannot be empty.")
   @Size(min = 3, max = 20, message = "Last name length must be between 3 and 20 characters!")
   private String lastName;
+  @NotEmpty(message = "Base URL should be provided.")
+  private String baseUrl;
 
   public String getFirstName() {
     return firstName;
@@ -80,6 +82,15 @@ public class UserRegisterDto {
 
   public UserRegisterDto setConfirmPassword(String confirmPassword) {
     this.confirmPassword = confirmPassword;
+    return this;
+  }
+
+  public String getBaseUrl() {
+    return baseUrl;
+  }
+
+  public UserRegisterDto setBaseUrl(String baseUrl) {
+    this.baseUrl = baseUrl;
     return this;
   }
 }

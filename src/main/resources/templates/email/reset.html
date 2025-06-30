@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<h1 th:text="#{reset_password_subject}">Password reset</h1>
+<th:block th:text="#{registration_dear_user(${fullName})}">Dear Aleksandra Mileva,</th:block>
+<p>
+  <span th:text="#{reset_username}">Your username is: </span>
+  <strong th:text="${username}"></strong>
+  <span th:text="#{reset_action}">. Please click on the link below to reset your password:</span>
+</p>
+<br>
+<a th:href="${verificationURL}" th:text="#{password_change}">Link Text</a>
+<br>
+<br>
+<div>
+  <p  th:text="#{registration_best_regards}">Best regards, </p>
+  <p  th:text="#{crafty_cocktails_team}">The CraftyCocktails Team</p>
+
+</div>
+</body>
+</html>

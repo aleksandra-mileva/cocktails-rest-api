@@ -1,6 +1,6 @@
 package com.example.cocktails.repository;
 
-import com.example.cocktails.model.dto.SearchCocktailDto;
+import com.example.cocktails.model.dto.cocktail.SearchCocktailDto;
 import com.example.cocktails.model.entity.CocktailEntity;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
