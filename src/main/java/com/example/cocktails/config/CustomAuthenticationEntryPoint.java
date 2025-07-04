@@ -1,42 +1,35 @@
 package com.example.cocktails.config;
 
-import com.example.cocktails.service.ResponseService;
+import com.example.cocktails.model.validation.ExceptionResponseDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
-import java.util.Map;
+import java.time.LocalDateTime;
 
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException{
-        if (request.getRequestURI().equals("/api/auth/login") && request.getMethod().equals("POST")) {
-            response.resetBuffer();
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+  @Override
+  public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+      throws IOException {
+    ExceptionResponseDTO body = new ExceptionResponseDTO();
+    body.setDateTime(LocalDateTime.now());
 
-            Map<String, Object> body = ResponseService.generateGeneralResponse("User or password is incorrect.");
-            response.getOutputStream()
-                    .print(objectMapper.writeValueAsString(body));
-
-            response.flushBuffer();
-        } else {
-            response.resetBuffer();
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            response.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-
-            Map<String, Object> body = ResponseService.generateGeneralResponse("Access denied.");
-            response.getOutputStream()
-                    .print(objectMapper.writeValueAsString(body));
-
-            response.flushBuffer();
-        }
+    if (request.getRequestURI().equals("/api/auth/login") && request.getMethod().equals("POST")) {
+      body.getMessages().add("User or password is incorrect.");
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    } else {
+      body.getMessages().add("Access denied.");
+      response.setStatus(HttpStatus.FORBIDDEN.value());
     }
+
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.getWriter().write(objectMapper.writeValueAsString(body));
+  }
 }

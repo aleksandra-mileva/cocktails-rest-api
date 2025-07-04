@@ -21,18 +21,17 @@ public class SecurityConfig {
   private final AuthenticationProvider authenticationProvider;
   private final AuthenticationEntryPoint authenticationEntryPoint;
 
+  // GET is available for everyone
   private final String[] whiteList = new String[]{
-      "/",
       "/api/cocktails/**",
       "/api/**",
-      "/api/maintenance/**",
       "/api/auth/register/verify/**"
   };
 
+  // POST is available only for anonymous
   private final String[] anonymousList = new String[]{
       "/api/auth/login",
       "/api/auth/register",
-      "/api/password/**"
   };
 
   // whiteList: "/", "/cocktails/**", "/api/**", "/maintenance/**"

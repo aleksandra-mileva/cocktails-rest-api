@@ -8,6 +8,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class CocktailSpecification implements Specification<CocktailEntity> {
 
@@ -18,44 +20,35 @@ public class CocktailSpecification implements Specification<CocktailEntity> {
   }
 
   @Override
-  public Predicate toPredicate(Root<CocktailEntity> root, CriteriaQuery<?> query,
-      CriteriaBuilder cb) {
-
-    Predicate p = cb.conjunction();
+  public Predicate toPredicate(Root<CocktailEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+    List<Predicate> predicates = new ArrayList<>();
 
     if (searchCocktailDto.name() != null && !searchCocktailDto.name().isEmpty()) {
       String searchName = "%" + searchCocktailDto.name().toLowerCase() + "%";
-      p.getExpressions().add(
-          cb.and(cb.like(cb.lower(root.get("name")), searchName)));
+      predicates.add(cb.like(cb.lower(root.get("name")), searchName));
     }
 
     if (searchCocktailDto.flavour() != null) {
-      p.getExpressions().add(
-          cb.equal(root.get("flavour"), searchCocktailDto.flavour()));
+      predicates.add(cb.equal(root.get("flavour"), searchCocktailDto.flavour()));
     }
 
     if (searchCocktailDto.spirit() != null) {
-      p.getExpressions().add(
-          cb.equal(root.get("spirit"), searchCocktailDto.spirit()));
+      predicates.add(cb.equal(root.get("spirit"), searchCocktailDto.spirit()));
+    }
+
+    if (searchCocktailDto.type() != null) {
+      predicates.add(cb.equal(root.get("type"), searchCocktailDto.type()));
     }
 
     if (searchCocktailDto.minPercentAlcohol() != null) {
-      p.getExpressions().add(
-          cb.and(cb.greaterThanOrEqualTo(root.get("percentAlcohol"),
-              searchCocktailDto.minPercentAlcohol())));
+      predicates.add(cb.greaterThanOrEqualTo(root.get("percentAlcohol"), searchCocktailDto.minPercentAlcohol()));
     }
 
     if (searchCocktailDto.maxPercentAlcohol() != null) {
-      p.getExpressions().add(
-          cb.and(cb.lessThanOrEqualTo(root.get("percentAlcohol"),
-              searchCocktailDto.maxPercentAlcohol())));
+      predicates.add(cb.lessThanOrEqualTo(root.get("percentAlcohol"), searchCocktailDto.maxPercentAlcohol()));
     }
 
-    if (searchCocktailDto.type()!= null) {
-      p.getExpressions().add(
-          cb.equal(root.get("type"), searchCocktailDto.type()));
-    }
+    return cb.and(predicates.toArray(new Predicate[0]));
 
-    return p;
   }
 }

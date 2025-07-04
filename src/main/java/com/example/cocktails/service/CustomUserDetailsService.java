@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         .findByUsername(username)
         .map(this::map)
         .orElseThrow(() -> {
-          logger.error("User with email {} not found.", username);
+          logger.error("User with username {} not found.", username);
           return new UsernameNotFoundException("User with username " + username + " not found.");
         });
   }

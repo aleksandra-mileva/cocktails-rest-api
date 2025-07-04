@@ -1,8 +1,10 @@
 package com.example.cocktails.service;
 
 import com.example.cocktails.model.dto.response.AuthenticationResponse;
+import com.example.cocktails.model.dto.user.UserEditDto;
 import com.example.cocktails.model.dto.user.UserLoginDto;
 import com.example.cocktails.model.dto.user.UserRegisterDto;
+import com.example.cocktails.model.dto.user.UserView;
 import com.example.cocktails.model.email.AccountVerificationEmailContext;
 import com.example.cocktails.model.entity.RoleEntity;
 import com.example.cocktails.model.entity.SecureTokenEntity;
@@ -14,6 +16,8 @@ import com.example.cocktails.repository.RoleRepository;
 import com.example.cocktails.repository.SecureTokenRepository;
 import com.example.cocktails.repository.UserRepository;
 import com.example.cocktails.web.exception.InvalidTokenException;
+import com.example.cocktails.web.exception.ObjectNotFoundException;
+import com.example.cocktails.web.exception.UsernameChangedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -85,7 +89,7 @@ public class UserService {
 
     UserEntity user = tokenOpt.get().getUser();
     if (user == null) {
-      return;
+      throw new InvalidTokenException();
     }
 
     user.setAccountVerified(true);
@@ -109,8 +113,46 @@ public class UserService {
     );
   }
 
+  public UserView getUserInformation(Long id) {
+    return this.userRepository.findById(id)
+        .map(userMapper::userEntityToUserViewDto)
+        .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));
+  }
+
+  public void updateUserProfile(Long id, UserEditDto dto) {
+    UserEntity existingUser = userRepository.findById(id)
+        .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));
+
+    boolean usernameChanged = !existingUser.getUsername().equalsIgnoreCase(dto.getUsername());
+
+    if (!existingUser.getUsername().equalsIgnoreCase(dto.getUsername())
+        && userRepository.existsByUsername(dto.getUsername())) {
+      throw new IllegalArgumentException("This username is already taken.");
+    }
+
+    if (!existingUser.getEmail().equalsIgnoreCase(dto.getEmail())
+        && userRepository.existsByEmail(dto.getEmail())) {
+      throw new IllegalArgumentException("This email is already taken.");
+    }
+
+    existingUser.setUsername(dto.getUsername())
+        .setEmail(dto.getEmail())
+        .setFirstName(dto.getFirstName())
+        .setLastName(dto.getLastName());
+
+    userRepository.save(existingUser);
+
+    if (usernameChanged) {
+      throw new UsernameChangedException("Username changed. Please log in again.");
+    }
+  }
+
+  public long getCountRegisteredUsers() {
+    return this.userRepository.count();
+  }
+
+
   private RoleEntity getUserRole() {
     return roleRepository.findByRole(RoleNameEnum.USER).orElseThrow();
   }
-
 }

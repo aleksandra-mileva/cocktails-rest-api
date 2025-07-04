@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 
 public class UserEditDto {
 
-  private Long id;
   @NotEmpty(message = "Email cannot be empty.")
   @Email(message = "Must be valid email address.")
   private String email;
@@ -53,15 +52,6 @@ public class UserEditDto {
 
   public UserEditDto setLastName(String lastName) {
     this.lastName = lastName;
-    return this;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public UserEditDto setId(Long id) {
-    this.id = id;
     return this;
   }
 }

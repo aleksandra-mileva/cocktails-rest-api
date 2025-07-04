@@ -1,10 +1,9 @@
 package com.example.cocktails.web.exception;
 
 import com.example.cocktails.model.validation.ExceptionResponseDTO;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,12 +16,6 @@ import java.util.List;
 @ControllerAdvice
 public class ExceptionsHandler {
 
-  private final MessageSource messageSource;
-
-  public ExceptionsHandler(MessageSource messageSource) {
-    this.messageSource = messageSource;
-  }
-
   @ExceptionHandler(InvalidFileException.class)
   public ResponseEntity<ExceptionResponseDTO> handleInvalidFileException(InvalidFileException ex) {
     return getResponseEntity(ex, HttpStatus.BAD_REQUEST);
@@ -32,10 +25,8 @@ public class ExceptionsHandler {
   public ResponseEntity<ExceptionResponseDTO> handleInvalidTokenException(InvalidTokenException ex) {
     ExceptionResponseDTO response = new ExceptionResponseDTO();
     response.setDateTime(LocalDateTime.now());
-    response.getMessages().add(
-        messageSource.getMessage("user.registration.verification.invalid.token", null, LocaleContextHolder.getLocale())
-    );
-    return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    response.getMessages().add("Token is expired or is invalid. Please provide a valid token.");
+    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
 
   @ExceptionHandler(ObjectNotFoundException.class)
@@ -46,7 +37,7 @@ public class ExceptionsHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ExceptionResponseDTO> handleMethodArgumentNotValidException(
-      MethodArgumentNotValidException ex){
+      MethodArgumentNotValidException ex) {
 
     List<String> errors = new ArrayList<>();
     ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -69,7 +60,19 @@ public class ExceptionsHandler {
     return getResponseEntity(ex, HttpStatus.CONFLICT);
   }
 
-  private ResponseEntity<ExceptionResponseDTO> getResponseEntity(Exception exception, HttpStatus httpStatus){
+  @ExceptionHandler(UsernameNotFoundException.class)
+  public ResponseEntity<ExceptionResponseDTO> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+
+    return getResponseEntity(ex, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(UsernameChangedException.class)
+  public ResponseEntity<ExceptionResponseDTO> handleUsernameChangedException(UsernameChangedException ex) {
+
+    return getResponseEntity(ex, HttpStatus.UNAUTHORIZED);
+  }
+
+  private ResponseEntity<ExceptionResponseDTO> getResponseEntity(Exception exception, HttpStatus httpStatus) {
     ExceptionResponseDTO response = new ExceptionResponseDTO();
     response.setDateTime(LocalDateTime.now());
     response.getMessages().add(exception.getMessage());

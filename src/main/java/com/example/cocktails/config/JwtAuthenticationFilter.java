@@ -1,13 +1,14 @@
 package com.example.cocktails.config;
 
+import com.example.cocktails.model.validation.ExceptionResponseDTO;
 import com.example.cocktails.service.JwtService;
-import jakarta.annotation.Nonnull;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.JwtException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -30,11 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(
-      @Nonnull HttpServletRequest request,
-      @Nonnull HttpServletResponse response,
-      @Nonnull FilterChain filterChain
-  ) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
     try {
       String jwtToken = parse(request);
@@ -42,18 +41,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authenticateRequest(request, jwtToken);
       }
     } catch (JwtException e) {
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.setContentType("application/json");
-      response.getWriter().write(e.getMessage() + " : Invalid or expired token, you may login and try again.");
+      writeError(response, HttpServletResponse.SC_UNAUTHORIZED,
+          "Invalid or expired token, you may login and try again.");
       return;
     } catch (Exception e) {
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.setContentType("application/json");
-      response.getWriter().write(e.getMessage());
+      writeError(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
       return;
     }
 
     filterChain.doFilter(request, response);
+  }
+
+  private void writeError(HttpServletResponse response, int status, String message) throws IOException {
+    ExceptionResponseDTO error = new ExceptionResponseDTO();
+    error.setDateTime(LocalDateTime.now());
+    error.getMessages().add(message);
+
+    response.setStatus(status);
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.getWriter().write(new ObjectMapper().writeValueAsString(error));
   }
 
   private void authenticateRequest(HttpServletRequest request, String jwtToken) {

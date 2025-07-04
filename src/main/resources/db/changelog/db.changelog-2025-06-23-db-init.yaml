@@ -10,8 +10,8 @@ databaseChangeLog:
                 (2, "ADMIN");
 
               INSERT INTO users(id, email, first_name, last_name, password, username, account_verified) VALUES
-                (1, "user@example.com", "User", "Userov", "f0e98959a250b665387e5aa6fa3a3e809105d3e58fde44b43595226285a22e0ce2984efe2fe1b16a", "user", true),
-                (2, "admin@example.com", "Admin", "Adminov", "f0e98959a250b665387e5aa6fa3a3e809105d3e58fde44b43595226285a22e0ce2984efe2fe1b16a", "admin", true);
+                (1, "user@example.com", "User", "Userov", "$2a$10$Z/94NoyQ4pCFK7Vh7e9jD.I1l4oa3FLEvVNaULF.Yw6YaBu7eZhxi", "user", true),
+                (2, "admin@example.com", "Admin", "Adminov", "$2a$10$Z/94NoyQ4pCFK7Vh7e9jD.I1l4oa3FLEvVNaULF.Yw6YaBu7eZhxi", "admin", true);
 
               INSERT INTO users_roles(user_id, role_id) VALUES
                 (1, 1), 
