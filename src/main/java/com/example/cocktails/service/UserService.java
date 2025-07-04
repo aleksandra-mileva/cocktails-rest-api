@@ -57,10 +57,8 @@ public class UserService {
   }
 
   public void register(UserRegisterDto userRegisterDto, Locale preferedLocale) {
-
     UserEntity newUser = userMapper.userRegisterDtoToUserEntity(userRegisterDto);
     newUser.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
-
     newUser.addRole(getUserRole());
     newUser.setAccountVerified(false);
     sendVerificationMail(this.userRepository.save(newUser), userRegisterDto.getBaseUrl(), preferedLocale);
@@ -120,17 +118,9 @@ public class UserService {
     UserEntity existingUser = userRepository.findById(id)
         .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));
 
+    validateProfileUpdate(existingUser, dto);
+
     boolean usernameChanged = !existingUser.getUsername().equalsIgnoreCase(dto.username());
-
-    if (!existingUser.getUsername().equalsIgnoreCase(dto.username())
-        && userRepository.existsByUsername(dto.username())) {
-      throw new IllegalArgumentException("This username is already taken.");
-    }
-
-    if (!existingUser.getEmail().equalsIgnoreCase(dto.email())
-        && userRepository.existsByEmail(dto.email())) {
-      throw new IllegalArgumentException("This email is already taken.");
-    }
 
     existingUser.setUsername(dto.username())
         .setEmail(dto.email())
@@ -148,6 +138,20 @@ public class UserService {
     return this.userRepository.count();
   }
 
+  private void validateProfileUpdate(UserEntity existingUser, UserEditDto dto) {
+    String newUsername = dto.username();
+    String newEmail = dto.email();
+
+    if (!existingUser.getUsername().equalsIgnoreCase(newUsername)
+        && userRepository.existsByUsername(newUsername)) {
+      throw new IllegalArgumentException("This username " + newUsername + " is already taken.");
+    }
+
+    if (!existingUser.getEmail().equalsIgnoreCase(newEmail)
+        && userRepository.existsByEmail(newEmail)) {
+      throw new IllegalArgumentException("This email " + newEmail + " is already taken.");
+    }
+  }
 
   private RoleEntity getUserRole() {
     return roleRepository.findByRole(RoleNameEnum.USER).orElseThrow();
