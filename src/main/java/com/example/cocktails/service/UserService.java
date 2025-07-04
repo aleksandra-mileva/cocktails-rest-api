@@ -22,7 +22,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +33,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
-  private final UserDetailsService userDetailsService;
   private final RoleRepository roleRepository;
   private final SecureTokenService secureTokenService;
   private final SecureTokenRepository secureTokenRepository;
@@ -43,14 +41,13 @@ public class UserService {
   private final JwtService jwtService;
 
   public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder,
-      UserDetailsService userDetailsService, RoleRepository roleRepository, SecureTokenService secureTokenService,
+      RoleRepository roleRepository, SecureTokenService secureTokenService,
       SecureTokenRepository secureTokenRepository, EmailService emailService,
       AuthenticationManager authenticationManager,
       JwtService jwtService) {
     this.userRepository = userRepository;
     this.userMapper = userMapper;
     this.passwordEncoder = passwordEncoder;
-    this.userDetailsService = userDetailsService;
     this.roleRepository = roleRepository;
     this.secureTokenService = secureTokenService;
     this.secureTokenRepository = secureTokenRepository;
@@ -123,22 +120,22 @@ public class UserService {
     UserEntity existingUser = userRepository.findById(id)
         .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));
 
-    boolean usernameChanged = !existingUser.getUsername().equalsIgnoreCase(dto.getUsername());
+    boolean usernameChanged = !existingUser.getUsername().equalsIgnoreCase(dto.username());
 
-    if (!existingUser.getUsername().equalsIgnoreCase(dto.getUsername())
-        && userRepository.existsByUsername(dto.getUsername())) {
+    if (!existingUser.getUsername().equalsIgnoreCase(dto.username())
+        && userRepository.existsByUsername(dto.username())) {
       throw new IllegalArgumentException("This username is already taken.");
     }
 
-    if (!existingUser.getEmail().equalsIgnoreCase(dto.getEmail())
-        && userRepository.existsByEmail(dto.getEmail())) {
+    if (!existingUser.getEmail().equalsIgnoreCase(dto.email())
+        && userRepository.existsByEmail(dto.email())) {
       throw new IllegalArgumentException("This email is already taken.");
     }
 
-    existingUser.setUsername(dto.getUsername())
-        .setEmail(dto.getEmail())
-        .setFirstName(dto.getFirstName())
-        .setLastName(dto.getLastName());
+    existingUser.setUsername(dto.username())
+        .setEmail(dto.email())
+        .setFirstName(dto.firstName())
+        .setLastName(dto.lastName());
 
     userRepository.save(existingUser);
 
