@@ -1,6 +1,7 @@
 package com.example.cocktails.web;
 
 import com.example.cocktails.model.dto.cocktail.AddCocktailDto;
+import com.example.cocktails.model.dto.cocktail.CocktailDetailsViewModel;
 import com.example.cocktails.model.dto.cocktail.CocktailViewModel;
 import com.example.cocktails.model.dto.cocktail.SearchCocktailDto;
 import com.example.cocktails.model.user.CustomUserDetails;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -41,4 +43,12 @@ public class CocktailController {
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     cocktailService.addCocktail(addCocktailDto, picture, userDetails);
   }
+
+  @GetMapping("/details/{id}")
+  public CocktailDetailsViewModel details(
+      @PathVariable Long id,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    return cocktailService.findCocktailDetailsViewModelById(id, userDetails);
+  }
+
 }

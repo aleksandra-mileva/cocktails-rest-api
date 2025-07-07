@@ -73,37 +73,7 @@ public class PictureService {
           "File with name " + file.getOriginalFilename() + " can not be uploaded.");
     }
   }
-//
-//  public boolean isOwner(String userName, Long pictureId) {
-//    boolean isOwner = pictureRepository.
-//        findById(pictureId).
-//        filter(picture -> picture.getAuthor().getUsername().equals(userName)).
-//        isPresent();
-//
-//    if (isOwner) {
-//      return true;
-//    }
-//
-//    return userRepository
-//        .findByUsername(userName)
-//        .filter(this::isAdmin)
-//        .isPresent();
-//  }
-//
-//  private boolean isAdmin(UserEntity user) {
-//    return user.getRoles().
-//        stream().
-//        anyMatch(r -> r.getRole() == RoleNameEnum.ADMIN);
-//  }
-//
-//  public PictureViewModel mapToPictureViewModel(PictureEntity picture, String principalName) {
-//    PictureViewModel pictureViewModel = modelMapper.map(picture, PictureViewModel.class);
-//    pictureViewModel.setCocktailId(picture.getCocktail().getId())
-//        .setAuthorUsername(picture.getAuthor().getUsername())
-//        .setCanNotDelete(!isOwner(principalName, picture.getId()));
-//    return pictureViewModel;
-//  }
-//
+
   public PictureHomePageViewModel mapToPictureHomePageViewModel(PictureEntity picture) {
     PictureHomePageViewModel pictureHomePageViewModel = pictureMapper.pictureEntityToPictureHomePageViewModel(picture);
 
