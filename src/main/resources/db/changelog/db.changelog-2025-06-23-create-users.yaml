@@ -39,7 +39,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: account_verified
-                  type: BOOLEAN
+                  type: BIT(1)
                   constraints:
                     nullable: false
               - column:

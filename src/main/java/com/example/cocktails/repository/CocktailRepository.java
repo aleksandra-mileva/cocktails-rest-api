@@ -15,9 +15,22 @@ import org.springframework.stereotype.Repository;
 public interface CocktailRepository extends JpaRepository<CocktailEntity, Long>,
     JpaSpecificationExecutor<CocktailEntity> {
 
-  Page<CocktailEntity> findAllByAuthor_Id(Long authorId, Pageable pageable);
-
-  Page<CocktailEntity> findAllBySpirit(SpiritNameEnum spiritName, Pageable pageable);
+  @Query("""
+        SELECT new com.example.cocktails.model.dto.cocktail.CocktailViewModel(
+          c.id,
+          c.name,
+          c.flavour,
+          c.spirit,
+          c.author.firstName,
+          c.author.lastName,
+          c.picture.url,
+          c.percentAlcohol,
+          c.servings
+        )
+        FROM CocktailEntity c
+        WHERE c.author.id = :userId
+      """)
+  Page<CocktailViewModel>findAllByAuthor_Id(Long authorId, Pageable pageable);
 
   @Query("""
         SELECT new com.example.cocktails.model.dto.cocktail.CocktailViewModel(
@@ -27,7 +40,7 @@ public interface CocktailRepository extends JpaRepository<CocktailEntity, Long>,
           c.spirit,
           c.author.firstName,
           c.author.lastName,
-          (SELECT p.url FROM PictureEntity p WHERE p.cocktail = c ORDER BY p.id ASC LIMIT 1),
+          c.picture.url,
           c.percentAlcohol,
           c.servings
         )

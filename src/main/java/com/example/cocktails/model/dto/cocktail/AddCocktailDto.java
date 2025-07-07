@@ -3,20 +3,12 @@ package com.example.cocktails.model.dto.cocktail;
 import com.example.cocktails.model.entity.enums.FlavourEnum;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
 import com.example.cocktails.model.entity.enums.TypeNameEnum;
-import com.example.cocktails.model.validation.AtLeastOneFile;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddCocktailDto {
-
-  @AtLeastOneFile
-  private List<MultipartFile> pictureFiles;
   @NotEmpty
   @Size(min = 5, max = 30)
   private String name;
@@ -35,19 +27,6 @@ public class AddCocktailDto {
   @NotNull
   @Positive
   private Integer servings;
-
-  public AddCocktailDto() {
-    this.pictureFiles = new ArrayList<>();
-  }
-
-  public List<MultipartFile> getPictureFiles() {
-    return pictureFiles;
-  }
-
-  public AddCocktailDto setPictureFiles(List<MultipartFile> pictureFiles) {
-    this.pictureFiles = pictureFiles;
-    return this;
-  }
 
   public String getName() {
     return name;

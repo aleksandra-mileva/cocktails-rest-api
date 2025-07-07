@@ -12,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -56,8 +57,8 @@ public class CocktailEntity extends BaseEntity {
   @NotNull
   private UserEntity author;
 
-  @OneToMany(mappedBy = "cocktail")
-  private List<PictureEntity> pictures;
+  @OneToOne(mappedBy = "cocktail")
+  private PictureEntity picture;
 
   @OneToMany(mappedBy = "cocktail", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<CommentEntity> comments;
@@ -155,12 +156,12 @@ public class CocktailEntity extends BaseEntity {
     return this;
   }
 
-  public List<PictureEntity> getPictures() {
-    return pictures;
+  public PictureEntity getPicture() {
+    return picture;
   }
 
-  public CocktailEntity setPictures(List<PictureEntity> pictures) {
-    this.pictures = pictures;
+  public CocktailEntity setPicture(PictureEntity picture) {
+    this.picture = picture;
     return this;
   }
 
