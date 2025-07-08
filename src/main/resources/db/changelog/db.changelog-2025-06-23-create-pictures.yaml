@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: create-table-pictures
+      id: create-table-cocktails
       author: aleksandra
       changes:
         - createTable:
@@ -30,12 +30,4 @@ databaseChangeLog:
                     nullable: false
                     foreignKeyName: fk_picture_author
                     referencedTableName: users
-                    referencedColumnNames: id
-              - column:
-                  name: cocktail_id
-                  type: BIGINT
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_picture_cocktail
-                    referencedTableName: cocktails
                     referencedColumnNames: id

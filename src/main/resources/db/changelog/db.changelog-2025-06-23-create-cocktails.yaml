@@ -63,3 +63,12 @@ databaseChangeLog:
                     foreignKeyName: fk_cocktail_author
                     referencedTableName: users
                     referencedColumnNames: id
+              - column:
+                  name: picture_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_cocktail_picture
+                    referencedTableName: pictures
+                    referencedColumnNames: id
+                    nullable: true
+                    unique: true

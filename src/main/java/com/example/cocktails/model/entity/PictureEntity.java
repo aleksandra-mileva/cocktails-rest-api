@@ -1,9 +1,7 @@
 package com.example.cocktails.model.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
@@ -21,11 +19,6 @@ public class PictureEntity extends BaseEntity {
   @ManyToOne
   @NotNull
   private UserEntity author;
-
-  @OneToOne
-  @JoinColumn(name = "cocktail_id")
-  @NotNull
-  private CocktailEntity cocktail;
 
   public String getUrl() {
     return url;
@@ -60,15 +53,6 @@ public class PictureEntity extends BaseEntity {
 
   public PictureEntity setAuthor(UserEntity author) {
     this.author = author;
-    return this;
-  }
-
-  public CocktailEntity getCocktail() {
-    return cocktail;
-  }
-
-  public PictureEntity setCocktail(CocktailEntity cocktail) {
-    this.cocktail = cocktail;
     return this;
   }
 }

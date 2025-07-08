@@ -1,8 +1,10 @@
 package com.example.cocktails.repository;
 
 import com.example.cocktails.model.dto.cocktail.CocktailViewModel;
+import com.example.cocktails.model.dto.cocktail.CocktailHomePageViewModel;
 import com.example.cocktails.model.entity.CocktailEntity;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
+import com.example.cocktails.model.entity.enums.TypeNameEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +12,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface CocktailRepository extends JpaRepository<CocktailEntity, Long>,
@@ -28,7 +32,7 @@ public interface CocktailRepository extends JpaRepository<CocktailEntity, Long>,
           c.servings
         )
         FROM CocktailEntity c
-        WHERE c.author.id = :userId
+        WHERE c.author.id = :authorId
       """)
   Page<CocktailViewModel>findAllByAuthor_Id(Long authorId, Pageable pageable);
 
@@ -49,6 +53,20 @@ public interface CocktailRepository extends JpaRepository<CocktailEntity, Long>,
         WHERE u.id = :userId
       """)
   Page<CocktailViewModel> findFavoriteCocktailsByUserId(@Param("userId") Long userId, Pageable pageable);
+
+
+  @Query("""
+      SELECT new com.example.cocktails.model.dto.cocktail.CocktailHomePageViewModel(
+        c.id,
+        c.picture.url,
+        c.author.firstName,
+        c.author.lastName
+      )
+      FROM CocktailEntity c
+      WHERE c.type = :type
+      ORDER BY FUNCTION('RAND')
+    """)
+  List<CocktailHomePageViewModel> getRandomCocktailsByType(@Param("type") TypeNameEnum type, Pageable pageable);
 
 
   long countCocktailEntitiesBySpirit(SpiritNameEnum spirit);

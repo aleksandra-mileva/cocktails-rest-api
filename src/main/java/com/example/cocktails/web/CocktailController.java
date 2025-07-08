@@ -10,11 +10,13 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,11 +39,12 @@ public class CocktailController {
   }
 
   @PostMapping(path = "/add", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-  public void addCocktail(
+  public Long addCocktail(
       @Valid @RequestPart(name = "addCocktailDto") AddCocktailDto addCocktailDto,
       @RequestPart(name = "picture") MultipartFile picture,
-      @AuthenticationPrincipal CustomUserDetails userDetails) {
-    cocktailService.addCocktail(addCocktailDto, picture, userDetails);
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    return cocktailService.addCocktail(addCocktailDto, picture, userDetails);
   }
 
   @GetMapping("/details/{id}")
@@ -51,4 +54,14 @@ public class CocktailController {
     return cocktailService.findCocktailDetailsViewModelById(id, userDetails);
   }
 
+  @PreAuthorize("@userAuth.hasPermissionAuthorOfCocktailOrAdmin(#id)")
+  @PutMapping("/edit/{id}")
+  public void updateCocktail(
+      @PathVariable Long id,
+      @Valid @RequestPart(name = "addCocktailDto") AddCocktailDto addCocktailDto,
+      @RequestPart(name = "picture",  required = false) MultipartFile picture,
+      @AuthenticationPrincipal CustomUserDetails userDetails
+      ) {
+    this.cocktailService.updateCocktail(id, addCocktailDto, picture, userDetails);
+  }
 }

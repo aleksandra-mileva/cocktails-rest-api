@@ -6,11 +6,11 @@ databaseChangeLog:
   - include:
       file: classpath:/db/changelog/db.changelog-2025-06-23-create-user-roles.yaml
   - include:
+      file: classpath:/db/changelog/db.changelog-2025-06-23-create-pictures.yaml
+  - include:
       file: classpath:/db/changelog/db.changelog-2025-06-23-create-cocktails.yaml
   - include:
       file: classpath:/db/changelog/db.changelog-2025-06-23-create-comments.yaml
-  - include:
-      file: classpath:/db/changelog/db.changelog-2025-06-23-create-pictures.yaml
   - include:
       file: classpath:/db/changelog/db.changelog-2025-06-23-create-tokens.yaml
   - include:

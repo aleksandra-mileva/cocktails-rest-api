@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -114,6 +115,7 @@ public class UserService {
         .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));
   }
 
+  @Transactional(noRollbackFor = UsernameChangedException.class)
   public void updateUserProfile(Long id, UserEditDto dto) {
     UserEntity existingUser = userRepository.findById(id)
         .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));

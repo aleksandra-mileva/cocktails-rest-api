@@ -2,6 +2,7 @@ package com.example.cocktails.service;
 
 import com.example.cocktails.model.dto.cocktail.AddCocktailDto;
 import com.example.cocktails.model.dto.cocktail.CocktailDetailsViewModel;
+import com.example.cocktails.model.dto.cocktail.CocktailHomePageViewModel;
 import com.example.cocktails.model.dto.cocktail.CocktailViewModel;
 import com.example.cocktails.model.dto.cocktail.SearchCocktailDto;
 import com.example.cocktails.model.entity.CocktailEntity;
@@ -9,6 +10,7 @@ import com.example.cocktails.model.entity.PictureEntity;
 import com.example.cocktails.model.entity.UserEntity;
 import com.example.cocktails.model.entity.enums.RoleNameEnum;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
+import com.example.cocktails.model.entity.enums.TypeNameEnum;
 import com.example.cocktails.model.mapper.CocktailMapper;
 import com.example.cocktails.model.mapper.PictureMapper;
 import com.example.cocktails.model.user.CustomUserDetails;
@@ -17,12 +19,15 @@ import com.example.cocktails.repository.CocktailSpecification;
 import com.example.cocktails.repository.UserRepository;
 import com.example.cocktails.web.exception.ObjectNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -71,18 +76,17 @@ public class CocktailService {
     return new PagedModel<>(result);
   }
 
-  public void addCocktail(AddCocktailDto addCocktailDto, MultipartFile file, CustomUserDetails userDetails) {
+  @Transactional
+  public Long addCocktail(AddCocktailDto addCocktailDto, MultipartFile file, CustomUserDetails userDetails) {
     CocktailEntity newCocktail = cocktailMapper.addCocktailDtoToCocktailEntity(addCocktailDto);
     newCocktail.setAuthor(userRepository.findById(userDetails.getId()).orElseThrow());
-    newCocktail = this.cocktailRepository.save(newCocktail);
 
     if (file != null && !file.isEmpty()) {
-      PictureEntity picture = pictureService.createAndSavePictureEntity(userDetails.getId(), file,
-          newCocktail.getId());
+      PictureEntity picture = pictureService.createAndSavePictureEntity(userDetails.getId(), file);
       newCocktail.setPicture(picture);
     }
 
-    this.cocktailRepository.save(newCocktail);
+    return this.cocktailRepository.save(newCocktail).getId();
   }
 
   public CocktailDetailsViewModel findCocktailDetailsViewModelById(Long id, CustomUserDetails userDetails) {
@@ -91,7 +95,7 @@ public class CocktailService {
 
     CocktailDetailsViewModel cocktailDetailsViewModel = cocktailMapper.entityToDetailsViewModel(cocktailEntity);
     cocktailDetailsViewModel.setIngredients(Arrays.stream(cocktailEntity.getIngredients().split("[\r\n]+"))
-            .collect(Collectors.toList()));
+        .collect(Collectors.toList()));
     cocktailDetailsViewModel.setAuthor(
         cocktailEntity.getAuthor().getFirstName() + " " + cocktailEntity.getAuthor().getLastName());
     cocktailDetailsViewModel.setVideoId(extractVideoId(cocktailEntity.getVideoUrl()));
@@ -104,6 +108,34 @@ public class CocktailService {
         isCocktailFavorite(username, cocktailEntity.getId()));
 
     return cocktailDetailsViewModel;
+  }
+
+  @Transactional
+  public void updateCocktail(Long cocktailId, AddCocktailDto addCocktailDto, MultipartFile file,
+      CustomUserDetails userDetails) {
+    CocktailEntity updateCocktail = this.cocktailRepository.findById(cocktailId)
+        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with id: " + cocktailId + " not found!"));
+
+    updateCocktail.setName(addCocktailDto.name())
+        .setIngredients(addCocktailDto.ingredients())
+        .setPreparation(addCocktailDto.preparation())
+        .setFlavour(addCocktailDto.flavour())
+        .setVideoUrl(addCocktailDto.videoUrl())
+        .setType(addCocktailDto.type())
+        .setSpirit(addCocktailDto.spirit())
+        .setPercentAlcohol(addCocktailDto.percentAlcohol())
+        .setServings(addCocktailDto.servings());
+
+    if (file != null && !file.isEmpty()) {
+      PictureEntity picture = pictureService.createAndSavePictureEntity(userDetails.getId(), file);
+      updateCocktail.setPicture(picture);
+    }
+
+    this.cocktailRepository.save(updateCocktail);
+  }
+
+  public List<CocktailHomePageViewModel> getThreeRandomCocktailsByType(TypeNameEnum type) {
+    return cocktailRepository.getRandomCocktailsByType(type, PageRequest.of(0, 3));
   }
 
   public long findCountBySpirit(SpiritNameEnum spiritNameEnum) {
@@ -144,7 +176,8 @@ public class CocktailService {
   }
 
   private static String extractVideoId(String videoUrl) {
-    String pattern = "(?<=v=|\\/videos\\/|embed\\/|youtu.be\\/|\\/v\\/|\\/e\\/|watch\\?v%3D|%2Fvideos%2F|%2Fvi%2F|v=|%2Fv%2F)([a-zA-Z0-9_-]{11})";
+    String pattern =
+        "(?<=v=|\\/videos\\/|embed\\/|youtu.be\\/|\\/v\\/|\\/e\\/|watch\\?v%3D|%2Fvideos%2F|%2Fvi%2F|v=|%2Fv%2F)([a-zA-Z0-9_-]{11})";
     Pattern compiledPattern = Pattern.compile(pattern);
     Matcher matcher = compiledPattern.matcher(videoUrl);
 
