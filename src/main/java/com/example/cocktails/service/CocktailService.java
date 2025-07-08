@@ -138,6 +138,19 @@ public class CocktailService {
     return cocktailRepository.getRandomCocktailsByType(type, PageRequest.of(0, 3));
   }
 
+  @Transactional
+  public void deleteCocktailById(Long cocktailId) {
+    CocktailEntity cocktail = cocktailRepository.findById(cocktailId)
+        .orElseThrow(
+            () -> new ObjectNotFoundException("Cocktail with ID " + cocktailId + " not found!"));
+
+    cocktail.getFavoriteUsers().forEach(user -> {
+      user.getFavorites().remove(cocktail);
+      userRepository.save(user);
+    });
+    cocktailRepository.deleteById(cocktailId);
+  }
+
   public long findCountBySpirit(SpiritNameEnum spiritNameEnum) {
     return this.cocktailRepository.countCocktailEntitiesBySpirit(spiritNameEnum);
   }
@@ -188,7 +201,7 @@ public class CocktailService {
     return null;
   }
 
-  public boolean isCocktailFavorite(String username, Long cocktailId) {
+  private boolean isCocktailFavorite(String username, Long cocktailId) {
     UserEntity user = this.userRepository.findByUsername(username).orElse(null);
 
     if (user == null) {

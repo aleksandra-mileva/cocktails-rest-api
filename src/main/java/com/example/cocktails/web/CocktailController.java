@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +39,7 @@ public class CocktailController {
     return cocktailService.searchCocktail(searchCocktailDto, pageable);
   }
 
-  @PostMapping(path = "/add", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+  @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
   public Long addCocktail(
       @Valid @RequestPart(name = "addCocktailDto") AddCocktailDto addCocktailDto,
       @RequestPart(name = "picture") MultipartFile picture,
@@ -47,7 +48,7 @@ public class CocktailController {
     return cocktailService.addCocktail(addCocktailDto, picture, userDetails);
   }
 
-  @GetMapping("/details/{id}")
+  @GetMapping("/{id}")
   public CocktailDetailsViewModel details(
       @PathVariable Long id,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -55,13 +56,19 @@ public class CocktailController {
   }
 
   @PreAuthorize("@userAuth.hasPermissionAuthorOfCocktailOrAdmin(#id)")
-  @PutMapping("/edit/{id}")
+  @PutMapping("/{id}")
   public void updateCocktail(
       @PathVariable Long id,
       @Valid @RequestPart(name = "addCocktailDto") AddCocktailDto addCocktailDto,
-      @RequestPart(name = "picture",  required = false) MultipartFile picture,
+      @RequestPart(name = "picture", required = false) MultipartFile picture,
       @AuthenticationPrincipal CustomUserDetails userDetails
-      ) {
+  ) {
     this.cocktailService.updateCocktail(id, addCocktailDto, picture, userDetails);
+  }
+
+  @PreAuthorize("@userAuth.hasPermissionAuthorOfCocktailOrAdmin(#id)")
+  @DeleteMapping("/{id}")
+  public void deleteCocktail(@PathVariable Long id) {
+    cocktailService.deleteCocktailById(id);
   }
 }

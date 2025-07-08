@@ -34,11 +34,6 @@ public class SecurityConfig {
       "/api/auth/register",
   };
 
-  // whiteList: "/", "/cocktails/**", "/api/**", "/maintenance/**"
-  // anonymousList: "/users/register/**", "/users/login", "/password/**"
-  // authenticated: "/users/profile", "/cocktails/add", "/users/profile/**", "/fortunes/fortune"
-  // for Admin only: "/statistics", "/fortunes", "/fortunes/**"
-
   public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, AuthenticationProvider authenticationProvider,
       AuthenticationEntryPoint authenticationEntryPoint) {
     this.jwtAuthFilter = jwtAuthFilter;
