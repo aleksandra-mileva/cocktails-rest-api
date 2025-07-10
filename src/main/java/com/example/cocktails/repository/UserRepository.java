@@ -27,4 +27,32 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
   List<UserEntity> findAllByAccountVerifiedEqualsAndCreatedOnBefore(boolean accountVerified,
       Timestamp createdOn);
+
+  // Alternative for isCocktailInUserFavorites:
+//  @Query("""
+//      SELECT CASE when COUNT(f)>0 then true else false end
+//      from UserEntity u
+//      join u.favorites f
+//      where u.username = :username and f.id = :cocktailId
+//      """)
+//  boolean isCocktailInUserFavorites(String username, Long cocktailId);
+
+  @Query("""
+    SELECT EXISTS (
+        SELECT 1
+        FROM UserEntity u
+        JOIN u.favorites f
+        WHERE u.id = :id AND f.id = :cocktailId
+    )
+""")
+  boolean isCocktailInUserFavorites(Long id, Long cocktailId);
+
+  @Query("""
+    SELECT EXISTS (
+        SELECT 1 FROM UserEntity u
+        JOIN u.roles r
+        WHERE u.id = :id AND r.role = :role
+    )
+""")
+  boolean existsByUserIdAndRole(Long id, RoleNameEnum role);
 }

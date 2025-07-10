@@ -1,6 +1,6 @@
 package com.example.cocktails.service;
 
-import com.example.cocktails.model.dto.statistics.StatisticsViewDto;
+import com.example.cocktails.model.dto.statistics.StatisticsViewModel;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +17,8 @@ public class StatisticsService {
     this.userService = userService;
   }
 
-  public StatisticsViewDto getStatistics() {
-    return new StatisticsViewDto(
+  public StatisticsViewModel getStatistics() {
+    return new StatisticsViewModel(
         this.cocktailService.findCountAll(),
         this.cocktailService.findCountBySpirit(SpiritNameEnum.WHISKEY),
         this.cocktailService.findCountBySpirit(SpiritNameEnum.TEQUILA),

@@ -61,7 +61,7 @@ public class AuthService {
   }
 
   public void sendVerificationMail(UserEntity newUser, String baseURL, Locale preferedLocale) {
-    SecureTokenEntity token = this.secureTokenService.createSecureToken(newUser);
+    SecureTokenEntity token = secureTokenService.createSecureToken(newUser);
 
     AccountVerificationEmailContext emailContext = new AccountVerificationEmailContext();
     emailContext.setToken(token.getToken());

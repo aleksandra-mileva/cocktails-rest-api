@@ -27,7 +27,6 @@ public class CloudinaryService {
     multipartFile.transferTo(tempFile);
 
     try {
-      @SuppressWarnings("unchecked")
       Map<String, String> uploadResult = this.cloudinary
           .uploader()
           .upload(tempFile, Map.of());

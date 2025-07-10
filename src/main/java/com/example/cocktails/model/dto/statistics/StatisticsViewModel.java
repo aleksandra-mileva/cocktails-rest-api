@@ -2,7 +2,7 @@ package com.example.cocktails.model.dto.statistics;
 
 import java.time.LocalDateTime;
 
-public record StatisticsViewDto(
+public record StatisticsViewModel(
     long allCocktails,
     long whiskeyCocktails,
     long tequilaCocktails,

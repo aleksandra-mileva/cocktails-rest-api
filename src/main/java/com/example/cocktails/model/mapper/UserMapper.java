@@ -1,14 +1,13 @@
 package com.example.cocktails.model.mapper;
 
-import com.example.cocktails.model.dto.user.UserEditDto;
 import com.example.cocktails.model.dto.user.UserRegisterDto;
-import com.example.cocktails.model.dto.user.UserView;
 import com.example.cocktails.model.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "roles", ignore = true)
   @Mapping(target = "addedCocktails", ignore = true)
@@ -17,8 +16,4 @@ public interface UserMapper {
   @Mapping(target = "favorites", ignore = true)
   @Mapping(target = "addedPictures", ignore = true)
   UserEntity userRegisterDtoToUserEntity(UserRegisterDto userRegisterDto);
-
-  UserEditDto userEntityToUserEditDto(UserEntity userEntity);
-
-  UserView userEntityToUserViewDto(UserEntity userEntity);
 }

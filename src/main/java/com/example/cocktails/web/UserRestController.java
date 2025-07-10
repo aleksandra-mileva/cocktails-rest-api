@@ -2,7 +2,7 @@ package com.example.cocktails.web;
 
 import com.example.cocktails.model.dto.cocktail.CocktailViewModel;
 import com.example.cocktails.model.dto.user.UserEditDto;
-import com.example.cocktails.model.dto.user.UserView;
+import com.example.cocktails.model.dto.user.UserViewModel;
 import com.example.cocktails.model.user.CustomUserDetails;
 import com.example.cocktails.service.CocktailService;
 import com.example.cocktails.service.UserService;
@@ -36,7 +36,7 @@ public class UserRestController {
 
   @PreAuthorize("#id == authentication.principal.id")
   @GetMapping("/{id}")
-  public UserView getUserInformation(@PathVariable Long id) {
+  public UserViewModel getUserInformation(@PathVariable Long id) {
     return userService.getUserInformation(id);
   }
 

@@ -4,6 +4,8 @@ import com.example.cocktails.model.dto.cocktail.AddCocktailDto;
 import com.example.cocktails.model.dto.cocktail.CocktailDetailsViewModel;
 import com.example.cocktails.model.dto.cocktail.CocktailViewModel;
 import com.example.cocktails.model.dto.cocktail.SearchCocktailDto;
+import com.example.cocktails.model.dto.comment.AddCommentDto;
+import com.example.cocktails.model.dto.comment.CommentViewModel;
 import com.example.cocktails.model.user.CustomUserDetails;
 import com.example.cocktails.service.CocktailService;
 import jakarta.validation.Valid;
@@ -18,10 +20,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @CrossOrigin("*")
 @RestController
@@ -63,12 +68,38 @@ public class CocktailController {
       @RequestPart(name = "picture", required = false) MultipartFile picture,
       @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
-    this.cocktailService.updateCocktail(id, addCocktailDto, picture, userDetails);
+    cocktailService.updateCocktail(id, addCocktailDto, picture, userDetails);
   }
 
   @PreAuthorize("@userAuth.hasPermissionAuthorOfCocktailOrAdmin(#id)")
   @DeleteMapping("/{id}")
   public void deleteCocktail(@PathVariable Long id) {
     cocktailService.deleteCocktailById(id);
+  }
+
+  @GetMapping("/{id}/comments")
+  public List<CommentViewModel> comments(
+      @PathVariable Long id,
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    return cocktailService.getCommentsByCocktailId(id, userDetails);
+  }
+
+  @PostMapping("/{id}/comments")
+  public CommentViewModel addComment(
+      @PathVariable Long id,
+      @RequestBody @Valid AddCommentDto addCommentDto,
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    return cocktailService.addComment(id, addCommentDto, userDetails);
+  }
+
+  @PreAuthorize("@userAuth.hasPermissionAuthorOfCommentOrAdmin(#commentId)")
+  @DeleteMapping("/{cocktailId}/comments/{commentId}")
+  public void deleteComment(
+      @PathVariable Long cocktailId,
+      @PathVariable Long commentId
+  ) {
+    cocktailService.deleteCommentById(cocktailId, commentId);
   }
 }

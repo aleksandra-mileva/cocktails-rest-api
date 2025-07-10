@@ -20,6 +20,15 @@ public class UserAuthorizationService {
       return false;
     }
 
-    return cocktailService.isOwner(userDetails.getUsername(), cocktailId);
+    return cocktailService.isOwnerOrAdminOfCocktail(userDetails.getId(), cocktailId);
+  }
+
+  public boolean hasPermissionAuthorOfCommentOrAdmin(Long commentId) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+      return false;
+    }
+
+    return cocktailService.isOwnerOrAdminOfComment(userDetails.getId(), commentId);
   }
 }

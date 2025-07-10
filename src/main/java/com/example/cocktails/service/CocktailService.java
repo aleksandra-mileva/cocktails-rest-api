@@ -5,17 +5,20 @@ import com.example.cocktails.model.dto.cocktail.CocktailDetailsViewModel;
 import com.example.cocktails.model.dto.cocktail.CocktailHomePageViewModel;
 import com.example.cocktails.model.dto.cocktail.CocktailViewModel;
 import com.example.cocktails.model.dto.cocktail.SearchCocktailDto;
+import com.example.cocktails.model.dto.comment.AddCommentDto;
+import com.example.cocktails.model.dto.comment.CommentViewModel;
 import com.example.cocktails.model.entity.CocktailEntity;
+import com.example.cocktails.model.entity.CommentEntity;
 import com.example.cocktails.model.entity.PictureEntity;
-import com.example.cocktails.model.entity.UserEntity;
 import com.example.cocktails.model.entity.enums.RoleNameEnum;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
 import com.example.cocktails.model.entity.enums.TypeNameEnum;
 import com.example.cocktails.model.mapper.CocktailMapper;
-import com.example.cocktails.model.mapper.PictureMapper;
+import com.example.cocktails.model.mapper.CommentMapper;
 import com.example.cocktails.model.user.CustomUserDetails;
 import com.example.cocktails.repository.CocktailRepository;
 import com.example.cocktails.repository.CocktailSpecification;
+import com.example.cocktails.repository.CommentRepository;
 import com.example.cocktails.repository.UserRepository;
 import com.example.cocktails.web.exception.ObjectNotFoundException;
 import org.springframework.data.domain.Page;
@@ -26,28 +29,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 public class CocktailService {
 
   private final CocktailRepository cocktailRepository;
+  private final CommentRepository commentRepository;
   private final UserRepository userRepository;
   private final PictureService pictureService;
   private final CocktailMapper cocktailMapper;
-  private final PictureMapper pictureMapper;
+  private final CommentMapper commentMapper;
 
   public CocktailService(CocktailRepository cocktailRepository, UserRepository userRepository,
-      PictureService pictureService, CocktailMapper cocktailMapper, PictureMapper pictureMapper) {
+      PictureService pictureService, CocktailMapper cocktailMapper, CommentRepository commentRepository,
+      CommentMapper commentMapper) {
     this.cocktailRepository = cocktailRepository;
     this.userRepository = userRepository;
     this.pictureService = pictureService;
     this.cocktailMapper = cocktailMapper;
-    this.pictureMapper = pictureMapper;
+    this.commentRepository = commentRepository;
+    this.commentMapper = commentMapper;
   }
 
   public PagedModel<CocktailViewModel> findAllCocktailsUploadedByUserId(Long userId, Pageable pageable) {
@@ -90,31 +97,33 @@ public class CocktailService {
   }
 
   public CocktailDetailsViewModel findCocktailDetailsViewModelById(Long id, CustomUserDetails userDetails) {
-    CocktailEntity cocktailEntity = this.cocktailRepository.findById(id)
+    CocktailDetailsViewModel vm = cocktailRepository.findCocktailDetailsById(id)
         .orElseThrow(() -> new ObjectNotFoundException("Cocktail with ID " + id + " not found!"));
 
-    CocktailDetailsViewModel cocktailDetailsViewModel = cocktailMapper.entityToDetailsViewModel(cocktailEntity);
-    cocktailDetailsViewModel.setIngredients(Arrays.stream(cocktailEntity.getIngredients().split("[\r\n]+"))
-        .collect(Collectors.toList()));
-    cocktailDetailsViewModel.setAuthor(
-        cocktailEntity.getAuthor().getFirstName() + " " + cocktailEntity.getAuthor().getLastName());
-    cocktailDetailsViewModel.setVideoId(extractVideoId(cocktailEntity.getVideoUrl()));
-    cocktailDetailsViewModel.setPicture(pictureMapper.pictureEntityToPictureViewModel(cocktailEntity.getPicture()));
+    vm.setIngredients(Arrays.stream(vm.getIngredientsRaw().split("[\r\n]+")).toList());
+    vm.setAuthor(vm.getAuthorFirstName() + " " + vm.getAuthorLastName());
+    vm.setVideoId(extractVideoId(vm.getVideoUrl()));
 
-    String username = userDetails != null ? userDetails.getUsername() : null;
-    cocktailDetailsViewModel.setCanDelete(username != null && isOwner(username, id));
+    Long userId = userDetails != null ? userDetails.getId() : null;
 
-    cocktailDetailsViewModel.setIsFavorite(
-        isCocktailFavorite(username, cocktailEntity.getId()));
+    List<CommentViewModel> comments = commentRepository.findByCocktailId(id)
+        .stream()
+        .map(comment ->
+            comment.setCanDelete(userId != null && isOwnerOrAdminOfComment(userId, comment.getId())))
+        .toList();
+    vm.setComments(comments);
 
-    return cocktailDetailsViewModel;
+    vm.setCanDelete(userId != null && isOwnerOrAdminOfCocktail(userId, id));
+    vm.setFavorite(isCocktailFavorite(userId, id));
+
+    return vm;
   }
 
   @Transactional
-  public void updateCocktail(Long cocktailId, AddCocktailDto addCocktailDto, MultipartFile file,
+  public void updateCocktail(Long id, AddCocktailDto addCocktailDto, MultipartFile file,
       CustomUserDetails userDetails) {
-    CocktailEntity updateCocktail = this.cocktailRepository.findById(cocktailId)
-        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with id: " + cocktailId + " not found!"));
+    CocktailEntity updateCocktail = this.cocktailRepository.findById(id)
+        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with id: " + id + " not found!"));
 
     updateCocktail.setName(addCocktailDto.name())
         .setIngredients(addCocktailDto.ingredients())
@@ -139,16 +148,54 @@ public class CocktailService {
   }
 
   @Transactional
-  public void deleteCocktailById(Long cocktailId) {
-    CocktailEntity cocktail = cocktailRepository.findById(cocktailId)
-        .orElseThrow(
-            () -> new ObjectNotFoundException("Cocktail with ID " + cocktailId + " not found!"));
+  public void deleteCocktailById(Long id) {
+    CocktailEntity cocktail = cocktailRepository.findById(id)
+        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with ID " + id + " not found!"));
 
     cocktail.getFavoriteUsers().forEach(user -> {
       user.getFavorites().remove(cocktail);
       userRepository.save(user);
     });
-    cocktailRepository.deleteById(cocktailId);
+    cocktailRepository.deleteById(id);
+  }
+
+  public List<CommentViewModel> getCommentsByCocktailId(Long id, CustomUserDetails userDetails) {
+    if (!cocktailRepository.existsById(id)) {
+      throw new ObjectNotFoundException("Cocktail with ID " + id + " not found!");
+    }
+
+    Long userId = userDetails != null ? userDetails.getId() : null;
+
+    return commentRepository.findByCocktailId(id)
+        .stream()
+        .map(comment ->
+            comment.setCanDelete(userId != null && isOwnerOrAdminOfComment(userId, comment.getId())))
+        .toList();
+  }
+
+  public CommentViewModel addComment(Long id, AddCommentDto addCommentDto, CustomUserDetails userDetails) {
+    CocktailEntity cocktail = cocktailRepository.findById(id)
+        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with ID " + id + " not found!"));
+
+    CommentEntity newComment = new CommentEntity()
+        .setText(addCommentDto.text())
+        .setCreated(LocalDateTime.now())
+        .setAuthor(userRepository.findById(userDetails.getId()).orElseThrow())
+        .setCocktail(cocktail);
+
+    CommentViewModel commentViewModel = commentMapper.commentToCommentViewModel(commentRepository.save(newComment));
+    commentViewModel.setCanDelete(true);
+    return commentViewModel;
+  }
+
+  public void deleteCommentById(Long cocktailId, Long commentId) {
+    CommentEntity commentEntity = commentRepository.findById(commentId)
+        .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + commentId + " not found!"));
+
+    if (!Objects.equals(commentEntity.getCocktail().getId(), cocktailId)) {
+      throw new IllegalArgumentException("Comment does not belong to this cocktail.");
+    }
+    commentRepository.delete(commentEntity);
   }
 
   public long findCountBySpirit(SpiritNameEnum spiritNameEnum) {
@@ -159,26 +206,14 @@ public class CocktailService {
     return this.cocktailRepository.count();
   }
 
-  public boolean isOwner(String userName, Long cocktailId) {
-    boolean isOwner = cocktailRepository.
-        findById(cocktailId).
-        filter(r -> r.getAuthor().getUsername().equals(userName)).
-        isPresent();
-
-    if (isOwner) {
-      return true;
-    }
-
-    return userRepository
-        .findByUsername(userName)
-        .filter(this::isAdmin)
-        .isPresent();
+  public boolean isOwnerOrAdminOfCocktail(Long userId, Long cocktailId) {
+    return cocktailRepository.existsByIdAndAuthor_Id(cocktailId, userId) ||
+        userRepository.existsByUserIdAndRole(userId, RoleNameEnum.ADMIN);
   }
 
-  private boolean isAdmin(UserEntity user) {
-    return user.getRoles().
-        stream().
-        anyMatch(r -> r.getRole() == RoleNameEnum.ADMIN);
+  public boolean isOwnerOrAdminOfComment(Long userId, Long commentId) {
+    return commentRepository.existsByIdAndAuthor_Id(commentId, userId) ||
+        userRepository.existsByUserIdAndRole(userId, RoleNameEnum.ADMIN);
   }
 
   private CocktailViewModel mapToCocktailViewModel(CocktailEntity cocktail) {
@@ -201,14 +236,11 @@ public class CocktailService {
     return null;
   }
 
-  private boolean isCocktailFavorite(String username, Long cocktailId) {
-    UserEntity user = this.userRepository.findByUsername(username).orElse(null);
-
-    if (user == null) {
+  private boolean isCocktailFavorite(Long userId, Long cocktailId) {
+    if (userId == null) {
       return false;
     }
 
-    return user.getFavorites().stream().map(CocktailEntity::getId)
-        .anyMatch(id -> id.equals(cocktailId));
+    return userRepository.isCocktailInUserFavorites(userId, cocktailId);
   }
 }

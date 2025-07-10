@@ -1,7 +1,7 @@
 package com.example.cocktails.model.dto.cocktail;
 
+import com.example.cocktails.model.dto.comment.CommentViewModel;
 import com.example.cocktails.model.dto.picture.PictureViewModel;
-import com.example.cocktails.model.entity.CommentEntity;
 import com.example.cocktails.model.entity.enums.FlavourEnum;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
 
@@ -11,51 +11,63 @@ public class CocktailDetailsViewModel {
 
   private Long id;
   private String name;
-  private List<String> ingredients;
+  private String ingredientsRaw;
   private String preparation;
   private FlavourEnum flavour;
-  private String author;
-  private String videoId;
+  private String authorFirstName;
+  private String authorLastName;
+  private String videoUrl;
   private SpiritNameEnum spirit;
-  private PictureViewModel picture;
-  private List<CommentEntity> comments;
+  private String pictureUrl;
   private Integer percentAlcohol;
   private Integer servings;
+
+  // Not from DB – set manually
+  private List<String> ingredients;
+  private String author;
+  private String videoId;
+  private PictureViewModel picture;
+  private List<CommentViewModel> comments;
   private boolean canDelete;
-  boolean isFavorite;
+  private boolean isFavorite;
 
-  public boolean isFavorite() {
-    return isFavorite;
-  }
-
-  public CocktailDetailsViewModel setIsFavorite(boolean favorite) {
-    isFavorite = favorite;
-    return this;
-  }
-
-  public boolean isCanDelete() {
-    return canDelete;
-  }
-
-  public void setCanDelete(boolean canDelete) {
-    this.canDelete = canDelete;
+  public CocktailDetailsViewModel(
+      Long id,
+      String name,
+      String ingredientsRaw,
+      String preparation,
+      FlavourEnum flavour,
+      String authorFirstName,
+      String authorLastName,
+      String videoUrl,
+      SpiritNameEnum spirit,
+      String pictureUrl,
+      Integer percentAlcohol,
+      Integer servings,
+      PictureViewModel picture
+  ) {
+    this.id = id;
+    this.name = name;
+    this.ingredientsRaw = ingredientsRaw;
+    this.preparation = preparation;
+    this.flavour = flavour;
+    this.authorFirstName = authorFirstName;
+    this.authorLastName = authorLastName;
+    this.videoUrl = videoUrl;
+    this.spirit = spirit;
+    this.pictureUrl = pictureUrl;
+    this.percentAlcohol = percentAlcohol;
+    this.servings = servings;
+    this.picture = picture;
   }
 
   public Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public CocktailDetailsViewModel setId(Long id) {
     this.id = id;
-  }
-
-
-  public SpiritNameEnum getSpirit() {
-    return spirit;
-  }
-
-  public void setSpirit(SpiritNameEnum spirit) {
-    this.spirit = spirit;
+    return this;
   }
 
   public String getName() {
@@ -67,12 +79,13 @@ public class CocktailDetailsViewModel {
     return this;
   }
 
-  public List<String> getIngredients() {
-    return ingredients;
+  public String getIngredientsRaw() {
+    return ingredientsRaw;
   }
 
-  public void setIngredients(List<String> ingredients) {
-    this.ingredients = ingredients;
+  public CocktailDetailsViewModel setIngredientsRaw(String ingredientsRaw) {
+    this.ingredientsRaw = ingredientsRaw;
+    return this;
   }
 
   public String getPreparation() {
@@ -90,6 +103,78 @@ public class CocktailDetailsViewModel {
 
   public CocktailDetailsViewModel setFlavour(FlavourEnum flavour) {
     this.flavour = flavour;
+    return this;
+  }
+
+  public String getAuthorFirstName() {
+    return authorFirstName;
+  }
+
+  public CocktailDetailsViewModel setAuthorFirstName(String authorFirstName) {
+    this.authorFirstName = authorFirstName;
+    return this;
+  }
+
+  public String getAuthorLastName() {
+    return authorLastName;
+  }
+
+  public CocktailDetailsViewModel setAuthorLastName(String authorLastName) {
+    this.authorLastName = authorLastName;
+    return this;
+  }
+
+  public String getVideoUrl() {
+    return videoUrl;
+  }
+
+  public CocktailDetailsViewModel setVideoUrl(String videoUrl) {
+    this.videoUrl = videoUrl;
+    return this;
+  }
+
+  public SpiritNameEnum getSpirit() {
+    return spirit;
+  }
+
+  public CocktailDetailsViewModel setSpirit(SpiritNameEnum spirit) {
+    this.spirit = spirit;
+    return this;
+  }
+
+  public String getPictureUrl() {
+    return pictureUrl;
+  }
+
+  public CocktailDetailsViewModel setPictureUrl(String pictureUrl) {
+    this.pictureUrl = pictureUrl;
+    return this;
+  }
+
+  public Integer getPercentAlcohol() {
+    return percentAlcohol;
+  }
+
+  public CocktailDetailsViewModel setPercentAlcohol(Integer percentAlcohol) {
+    this.percentAlcohol = percentAlcohol;
+    return this;
+  }
+
+  public Integer getServings() {
+    return servings;
+  }
+
+  public CocktailDetailsViewModel setServings(Integer servings) {
+    this.servings = servings;
+    return this;
+  }
+
+  public List<String> getIngredients() {
+    return ingredients;
+  }
+
+  public CocktailDetailsViewModel setIngredients(List<String> ingredients) {
+    this.ingredients = ingredients;
     return this;
   }
 
@@ -120,28 +205,31 @@ public class CocktailDetailsViewModel {
     return this;
   }
 
-  public List<CommentEntity> getComments() {
+  public List<CommentViewModel> getComments() {
     return comments;
   }
 
-  public CocktailDetailsViewModel setComments(List<CommentEntity> comments) {
+  public CocktailDetailsViewModel setComments(
+      List<CommentViewModel> comments) {
     this.comments = comments;
     return this;
   }
 
-  public Integer getPercentAlcohol() {
-    return percentAlcohol;
+  public boolean isCanDelete() {
+    return canDelete;
   }
 
-  public void setPercentAlcohol(Integer percentAlcohol) {
-    this.percentAlcohol = percentAlcohol;
+  public CocktailDetailsViewModel setCanDelete(boolean canDelete) {
+    this.canDelete = canDelete;
+    return this;
   }
 
-  public Integer getServings() {
-    return servings;
+  public boolean isFavorite() {
+    return isFavorite;
   }
 
-  public void setServings(Integer servings) {
-    this.servings = servings;
+  public CocktailDetailsViewModel setFavorite(boolean favorite) {
+    isFavorite = favorite;
+    return this;
   }
 }

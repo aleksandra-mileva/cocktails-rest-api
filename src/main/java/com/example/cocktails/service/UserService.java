@@ -1,10 +1,9 @@
 package com.example.cocktails.service;
 
 import com.example.cocktails.model.dto.user.UserEditDto;
-import com.example.cocktails.model.dto.user.UserView;
+import com.example.cocktails.model.dto.user.UserViewModel;
 import com.example.cocktails.model.entity.CocktailEntity;
 import com.example.cocktails.model.entity.UserEntity;
-import com.example.cocktails.model.mapper.UserMapper;
 import com.example.cocktails.model.user.CustomUserDetails;
 import com.example.cocktails.repository.CocktailRepository;
 import com.example.cocktails.repository.UserRepository;
@@ -13,22 +12,31 @@ import com.example.cocktails.web.exception.UsernameChangedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UserService {
   private final UserRepository userRepository;
   private final CocktailRepository cocktailRepository;
-  private final UserMapper userMapper;
 
-  public UserService(UserRepository userRepository, CocktailRepository cocktailRepository, UserMapper userMapper) {
+  public UserService(UserRepository userRepository, CocktailRepository cocktailRepository) {
     this.userRepository = userRepository;
     this.cocktailRepository = cocktailRepository;
-    this.userMapper = userMapper;
   }
 
-  public UserView getUserInformation(Long id) {
-    return this.userRepository.findById(id)
-        .map(userMapper::userEntityToUserViewDto)
+  public UserViewModel getUserInformation(Long id) {
+    UserEntity userEntity = this.userRepository.findById(id)
         .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));
+    List<String> roles = userEntity.getRoles().stream().map(r -> r.getRole().name()).toList();
+
+    return new UserViewModel(
+        userEntity.getId(),
+        userEntity.getUsername(),
+        userEntity.getFirstName(),
+        userEntity.getLastName(),
+        userEntity.getEmail(),
+        roles
+    );
   }
 
   @Transactional(noRollbackFor = UsernameChangedException.class)

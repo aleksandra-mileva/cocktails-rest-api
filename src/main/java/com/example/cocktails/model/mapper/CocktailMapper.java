@@ -1,7 +1,6 @@
 package com.example.cocktails.model.mapper;
 
 import com.example.cocktails.model.dto.cocktail.AddCocktailDto;
-import com.example.cocktails.model.dto.cocktail.CocktailDetailsViewModel;
 import com.example.cocktails.model.dto.cocktail.CocktailViewModel;
 import com.example.cocktails.model.entity.CocktailEntity;
 import org.mapstruct.Mapper;
@@ -20,12 +19,4 @@ public interface CocktailMapper {
   @Mapping(target = "comments", ignore = true)
   @Mapping(target = "favoriteUsers", ignore = true)
   CocktailEntity addCocktailDtoToCocktailEntity(AddCocktailDto addCocktailDto);
-
-  @Mapping(target = "ingredients", ignore = true)
-  @Mapping(target = "author", ignore = true)
-  @Mapping(target = "videoId", ignore = true)
-  @Mapping(target = "picture", ignore = true)
-  @Mapping(target = "canDelete", ignore = true)
-  @Mapping(target = "isFavorite", ignore = true)
-  CocktailDetailsViewModel entityToDetailsViewModel(CocktailEntity cocktail);
 }
