@@ -45,7 +45,7 @@ public class CocktailController {
   }
 
   @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-  public Long addCocktail(
+  public CocktailDetailsViewModel addCocktail(
       @Valid @RequestPart(name = "addCocktailDto") AddCocktailDto addCocktailDto,
       @RequestPart(name = "picture") MultipartFile picture,
       @AuthenticationPrincipal CustomUserDetails userDetails
@@ -62,13 +62,13 @@ public class CocktailController {
 
   @PreAuthorize("@userAuth.hasPermissionAuthorOfCocktailOrAdmin(#id)")
   @PutMapping("/{id}")
-  public void updateCocktail(
+  public CocktailDetailsViewModel updateCocktail(
       @PathVariable Long id,
       @Valid @RequestPart(name = "addCocktailDto") AddCocktailDto addCocktailDto,
       @RequestPart(name = "picture", required = false) MultipartFile picture,
       @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
-    cocktailService.updateCocktail(id, addCocktailDto, picture, userDetails);
+    return cocktailService.updateCocktail(id, addCocktailDto, picture, userDetails);
   }
 
   @PreAuthorize("@userAuth.hasPermissionAuthorOfCocktailOrAdmin(#id)")

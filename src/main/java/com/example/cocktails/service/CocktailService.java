@@ -84,7 +84,7 @@ public class CocktailService {
   }
 
   @Transactional
-  public Long addCocktail(AddCocktailDto addCocktailDto, MultipartFile file, CustomUserDetails userDetails) {
+  public CocktailDetailsViewModel addCocktail(AddCocktailDto addCocktailDto, MultipartFile file, CustomUserDetails userDetails) {
     CocktailEntity newCocktail = cocktailMapper.addCocktailDtoToCocktailEntity(addCocktailDto);
     newCocktail.setAuthor(userRepository.findById(userDetails.getId()).orElseThrow());
 
@@ -93,34 +93,24 @@ public class CocktailService {
       newCocktail.setPicture(picture);
     }
 
-    return this.cocktailRepository.save(newCocktail).getId();
+    CocktailDetailsViewModel vm =
+        cocktailMapper.cocktailEntityToDetailsViewModel(this.cocktailRepository.save(newCocktail));
+
+    return enhanceCocktailDetailsViewModel(vm, userDetails, true);
   }
 
   public CocktailDetailsViewModel findCocktailDetailsViewModelById(Long id, CustomUserDetails userDetails) {
     CocktailDetailsViewModel vm = cocktailRepository.findCocktailDetailsById(id)
         .orElseThrow(() -> new ObjectNotFoundException("Cocktail with ID " + id + " not found!"));
 
-    vm.setIngredients(Arrays.stream(vm.getIngredientsRaw().split("[\r\n]+")).toList());
-    vm.setAuthor(vm.getAuthorFirstName() + " " + vm.getAuthorLastName());
-    vm.setVideoId(extractVideoId(vm.getVideoUrl()));
-
     Long userId = userDetails != null ? userDetails.getId() : null;
+    boolean canDeleteCocktail = userId != null && isOwnerOrAdminOfCocktail(userId, id);
 
-    List<CommentViewModel> comments = commentRepository.findByCocktailId(id)
-        .stream()
-        .map(comment ->
-            comment.setCanDelete(userId != null && isOwnerOrAdminOfComment(userId, comment.getId())))
-        .toList();
-    vm.setComments(comments);
-
-    vm.setCanDelete(userId != null && isOwnerOrAdminOfCocktail(userId, id));
-    vm.setFavorite(isCocktailFavorite(userId, id));
-
-    return vm;
+    return enhanceCocktailDetailsViewModel(vm, userDetails, canDeleteCocktail);
   }
 
   @Transactional
-  public void updateCocktail(Long id, AddCocktailDto addCocktailDto, MultipartFile file,
+  public CocktailDetailsViewModel updateCocktail(Long id, AddCocktailDto addCocktailDto, MultipartFile file,
       CustomUserDetails userDetails) {
     CocktailEntity updateCocktail = this.cocktailRepository.findById(id)
         .orElseThrow(() -> new ObjectNotFoundException("Cocktail with id: " + id + " not found!"));
@@ -140,7 +130,10 @@ public class CocktailService {
       updateCocktail.setPicture(picture);
     }
 
-    this.cocktailRepository.save(updateCocktail);
+    CocktailDetailsViewModel vm =
+        cocktailMapper.cocktailEntityToDetailsViewModel(this.cocktailRepository.save(updateCocktail));
+
+    return enhanceCocktailDetailsViewModel(vm, userDetails, true);
   }
 
   public List<CocktailHomePageViewModel> getThreeRandomCocktailsByType(TypeNameEnum type) {
@@ -221,6 +214,28 @@ public class CocktailService {
     cocktailViewModel.setAuthor(
         cocktail.getAuthor().getFirstName() + " " + cocktail.getAuthor().getLastName());
     return cocktailViewModel;
+  }
+
+  private CocktailDetailsViewModel enhanceCocktailDetailsViewModel(CocktailDetailsViewModel vm,
+      CustomUserDetails userDetails, boolean canDeleteCocktail) {
+
+    vm.setIngredients(Arrays.stream(vm.getIngredientsRaw().split("[\r\n]+")).toList());
+    vm.setAuthor(vm.getAuthorFirstName() + " " + vm.getAuthorLastName());
+    vm.setVideoId(extractVideoId(vm.getVideoUrl()));
+
+    Long userId = userDetails != null ? userDetails.getId() : null;
+
+    List<CommentViewModel> comments = commentRepository.findByCocktailId(vm.getId())
+        .stream()
+        .map(comment ->
+            comment.setCanDelete(userId != null && isOwnerOrAdminOfComment(userId, comment.getId())))
+        .toList();
+    vm.setComments(comments);
+
+    vm.setCanDelete(canDeleteCocktail);
+    vm.setFavorite(isCocktailFavorite(userId, vm.getId()));
+
+    return vm;
   }
 
   private static String extractVideoId(String videoUrl) {
