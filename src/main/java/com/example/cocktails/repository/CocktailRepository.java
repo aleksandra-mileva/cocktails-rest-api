@@ -68,7 +68,7 @@ public interface CocktailRepository extends JpaRepository<CocktailEntity, Long>,
       WHERE c.type = :type
       ORDER BY FUNCTION('RAND')
     """)
-  List<CocktailHomePageViewModel> getRandomCocktailsByType(@Param("type") TypeNameEnum type, Pageable pageable);
+  List<CocktailHomePageViewModel> getRandomCocktailByType(@Param("type") TypeNameEnum type, Pageable pageable);
 
   @Query("""
     SELECT new com.example.cocktails.model.dto.cocktail.CocktailDetailsViewModel(

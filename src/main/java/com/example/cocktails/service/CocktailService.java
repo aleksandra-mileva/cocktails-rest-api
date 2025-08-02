@@ -136,8 +136,9 @@ public class CocktailService {
     return enhanceCocktailDetailsViewModel(vm, userDetails, true);
   }
 
-  public List<CocktailHomePageViewModel> getThreeRandomCocktailsByType(TypeNameEnum type) {
-    return cocktailRepository.getRandomCocktailsByType(type, PageRequest.of(0, 3));
+  public CocktailHomePageViewModel getRandomCocktailByType(TypeNameEnum type) {
+    return cocktailRepository.getRandomCocktailByType(type, PageRequest.of(0, 1))
+        .stream().findFirst().orElse(null);
   }
 
   @Transactional
