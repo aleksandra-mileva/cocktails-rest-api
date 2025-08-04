@@ -1,6 +1,5 @@
 package com.example.cocktails.model.dto.cocktail;
 
-import com.example.cocktails.model.dto.comment.CommentViewModel;
 import com.example.cocktails.model.dto.picture.PictureViewModel;
 import com.example.cocktails.model.entity.enums.FlavourEnum;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
@@ -27,7 +26,6 @@ public class CocktailDetailsViewModel {
   private String author;
   private String videoId;
   private PictureViewModel picture;
-  private List<CommentViewModel> comments;
   private boolean canDelete;
   private boolean isFavorite;
 
@@ -202,16 +200,6 @@ public class CocktailDetailsViewModel {
 
   public CocktailDetailsViewModel setPicture(PictureViewModel picture) {
     this.picture = picture;
-    return this;
-  }
-
-  public List<CommentViewModel> getComments() {
-    return comments;
-  }
-
-  public CocktailDetailsViewModel setComments(
-      List<CommentViewModel> comments) {
-    this.comments = comments;
     return this;
   }
 

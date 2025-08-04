@@ -57,7 +57,8 @@ public class AuthService {
     newUser.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
     newUser.addRole(getUserRole());
     newUser.setAccountVerified(false);
-    sendVerificationMail(this.userRepository.save(newUser), userRegisterDto.getBaseUrl(), preferedLocale);
+    this.userRepository.save(newUser);
+//    sendVerificationMail(this.userRepository.save(newUser), userRegisterDto.getBaseUrl(), preferedLocale);
   }
 
   public void sendVerificationMail(UserEntity newUser, String baseURL, Locale preferedLocale) {
@@ -97,11 +98,10 @@ public class AuthService {
     SecurityContextHolder.getContext().setAuthentication(authentication);
     CustomUserDetails userPrincipal = (CustomUserDetails) authentication.getPrincipal();
 
-    return new AuthenticationResponse(
-        userPrincipal.getId(),
-        userPrincipal.getUsername(),
-        jwtService.generateToken(userPrincipal)
-    );
+    AuthenticationResponse authResponse = userMapper.userDetailsToAuthenticationResponse(userPrincipal);
+    authResponse.setToken(jwtService.generateToken(userPrincipal));
+
+    return authResponse;
   }
 
   private RoleEntity getUserRole() {

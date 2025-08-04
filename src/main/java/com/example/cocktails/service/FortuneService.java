@@ -38,7 +38,7 @@ public class FortuneService {
           .bodyToMono(Void.class)
           .block();
     } catch (WebClientResponseException.NotFound e) {
-      throw new ObjectNotFoundException("Fortune with id=" + fortuneId + " does not exist.");
+      throw new ObjectNotFoundException("fortune", "Fortune with id=" + fortuneId + " does not exist.");
     } catch (WebClientResponseException e) {
       throw new RuntimeException("Failed to delete fortune: " + e.getResponseBodyAsString(), e);
     }

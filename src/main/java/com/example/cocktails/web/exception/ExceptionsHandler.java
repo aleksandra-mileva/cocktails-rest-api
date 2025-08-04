@@ -10,45 +10,46 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @ControllerAdvice
 public class ExceptionsHandler {
 
   @ExceptionHandler(InvalidFileException.class)
   public ResponseEntity<ExceptionResponseDTO> handleInvalidFileException(InvalidFileException ex) {
-    return getResponseEntity(ex, HttpStatus.BAD_REQUEST);
+    ExceptionResponseDTO response = new ExceptionResponseDTO();
+    response.setDateTime(LocalDateTime.now());
+    response.addError(ex.getFile(), ex.getMessage());
+
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(InvalidTokenException.class)
   public ResponseEntity<ExceptionResponseDTO> handleInvalidTokenException(InvalidTokenException ex) {
     ExceptionResponseDTO response = new ExceptionResponseDTO();
     response.setDateTime(LocalDateTime.now());
-    response.getMessages().add("Token is expired or is invalid. Please provide a valid token.");
+    response.addError("token", "Token is expired or is invalid. Please provide a valid token.");
+
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
 
   @ExceptionHandler(ObjectNotFoundException.class)
   public ResponseEntity<ExceptionResponseDTO> handleObjectNotFoundException(ObjectNotFoundException ex) {
+    ExceptionResponseDTO response = new ExceptionResponseDTO();
+    response.setDateTime(LocalDateTime.now());
+    response.addError(ex.getObject(), ex.getMessage());
 
-    return getResponseEntity(ex, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ExceptionResponseDTO> handleMethodArgumentNotValidException(
       MethodArgumentNotValidException ex) {
-
-    List<String> errors = new ArrayList<>();
-    ex.getBindingResult().getAllErrors().forEach((error) -> {
-      String fieldName = ((FieldError) error).getField();
-      String message = error.getDefaultMessage();
-      errors.add(fieldName + ": " + message);
-    });
-
     ExceptionResponseDTO response = new ExceptionResponseDTO();
     response.setDateTime(LocalDateTime.now());
-    response.setMessages(errors);
+
+    for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+      response.addError(fieldError.getField(), fieldError.getDefaultMessage());
+    }
 
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
@@ -57,26 +58,30 @@ public class ExceptionsHandler {
   public ResponseEntity<ExceptionResponseDTO> handleIllegalArgumentException(
       IllegalArgumentException ex) {
 
-    return getResponseEntity(ex, HttpStatus.CONFLICT);
+    ExceptionResponseDTO response = new ExceptionResponseDTO();
+    response.setDateTime(LocalDateTime.now());
+
+    response.addError("argument", ex.getMessage());
+
+
+    return new ResponseEntity<>(response, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(UsernameNotFoundException.class)
   public ResponseEntity<ExceptionResponseDTO> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+    ExceptionResponseDTO response = new ExceptionResponseDTO();
+    response.setDateTime(LocalDateTime.now());
+    response.addError("username", ex.getMessage());
 
-    return getResponseEntity(ex, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(UsernameChangedException.class)
   public ResponseEntity<ExceptionResponseDTO> handleUsernameChangedException(UsernameChangedException ex) {
-
-    return getResponseEntity(ex, HttpStatus.UNAUTHORIZED);
-  }
-
-  private ResponseEntity<ExceptionResponseDTO> getResponseEntity(Exception exception, HttpStatus httpStatus) {
     ExceptionResponseDTO response = new ExceptionResponseDTO();
     response.setDateTime(LocalDateTime.now());
-    response.getMessages().add(exception.getMessage());
+    response.addError("username", ex.getMessage());
 
-    return new ResponseEntity<>(response, httpStatus);
+    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
 }

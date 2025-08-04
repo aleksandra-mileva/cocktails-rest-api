@@ -22,10 +22,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     body.setDateTime(LocalDateTime.now());
 
     if (request.getRequestURI().equals("/api/auth/login") && request.getMethod().equals("POST")) {
-      body.getMessages().add("User or password is incorrect.");
+      body.addError("user/password", "User or password is incorrect.");
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
     } else {
-      body.getMessages().add("Access denied.");
+      body.addError("user/password", "Access denied.");
       response.setStatus(HttpStatus.FORBIDDEN.value());
     }
 

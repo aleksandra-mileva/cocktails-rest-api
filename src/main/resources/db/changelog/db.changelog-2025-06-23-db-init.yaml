@@ -19,8 +19,8 @@ databaseChangeLog:
               
               INSERT INTO pictures(id, public_id, title, url, author_id) VALUES
                 (1, "rfx5pdjd6cpn3pbbrtcm", "PinaColada", "https://res.cloudinary.com/dlknl4mzd/image/upload/v1723493424/rfx5pdjd6cpn3pbbrtcm.jpg", 1),
-                (2, "kgv4ekkxr9goboq44sfg", "Manhatten", "https://res.cloudinary.com/dlknl4mzd/image/upload/v1723131202/kgv4ekkxr9goboq44sfg.png", 1),
-                (3, "dicy7bijiddeksrawdzq8", "teqilaSunrise", "https://res.cloudinary.com/dlknl4mzd/image/upload/v1723493458/dicy7bijiddeksrawdzq8.jpg", 1),
+                (2, "manhattan_p8yzfc", "Manhatten", "https://res.cloudinary.com/dlknl4mzd/image/upload/v1754169629/manhattan_p8yzfc.jpg", 1),
+                (3, "tequila-sunrise_fz2ejb", "teqilaSunrise", "https://res.cloudinary.com/dlknl4mzd/image/upload/v1754169629/tequila-sunrise_fz2ejb.jpg", 1),
                 (4, "mz8brm4guvo2ghme4lcv", "Martini", "https://res.cloudinary.com/dlknl4mzd/image/upload/v1723378829/mz8brm4guvo2ghme4lcv.png", 1),
                 (5, "o3vakwrhgrzlgrctp4gs", "BloodyMary", "https://res.cloudinary.com/dlknl4mzd/image/upload/v1723131202/o3vakwrhgrzlgrctp4gs.jpg", 1),
                 (6, "exkybjsjyonsib8b4lnf", "BrandySour", "https://res.cloudinary.com/dlknl4mzd/image/upload/v1723131202/exkybjsjyonsib8b4lnf.jpg", 1),

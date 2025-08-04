@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,7 +83,8 @@ public class CocktailService {
   }
 
   @Transactional
-  public CocktailDetailsViewModel addCocktail(AddCocktailDto addCocktailDto, MultipartFile file, CustomUserDetails userDetails) {
+  public CocktailDetailsViewModel addCocktail(AddCocktailDto addCocktailDto, MultipartFile file,
+      CustomUserDetails userDetails) {
     CocktailEntity newCocktail = cocktailMapper.addCocktailDtoToCocktailEntity(addCocktailDto);
     newCocktail.setAuthor(userRepository.findById(userDetails.getId()).orElseThrow());
 
@@ -101,7 +101,7 @@ public class CocktailService {
 
   public CocktailDetailsViewModel findCocktailDetailsViewModelById(Long id, CustomUserDetails userDetails) {
     CocktailDetailsViewModel vm = cocktailRepository.findCocktailDetailsById(id)
-        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with ID " + id + " not found!"));
+        .orElseThrow(() -> new ObjectNotFoundException("cocktail"," Cocktail with ID " + id + " not found!"));
 
     Long userId = userDetails != null ? userDetails.getId() : null;
     boolean canDeleteCocktail = userId != null && isOwnerOrAdminOfCocktail(userId, id);
@@ -113,7 +113,7 @@ public class CocktailService {
   public CocktailDetailsViewModel updateCocktail(Long id, AddCocktailDto addCocktailDto, MultipartFile file,
       CustomUserDetails userDetails) {
     CocktailEntity updateCocktail = this.cocktailRepository.findById(id)
-        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with id: " + id + " not found!"));
+        .orElseThrow(() -> new ObjectNotFoundException("cocktail", "Cocktail with id: " + id + " not found!"));
 
     updateCocktail.setName(addCocktailDto.name())
         .setIngredients(addCocktailDto.ingredients())
@@ -144,7 +144,7 @@ public class CocktailService {
   @Transactional
   public void deleteCocktailById(Long id) {
     CocktailEntity cocktail = cocktailRepository.findById(id)
-        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with ID " + id + " not found!"));
+        .orElseThrow(() -> new ObjectNotFoundException("cocktail", "Cocktail with ID " + id + " not found!"));
 
     cocktail.getFavoriteUsers().forEach(user -> {
       user.getFavorites().remove(cocktail);
@@ -153,23 +153,24 @@ public class CocktailService {
     cocktailRepository.deleteById(id);
   }
 
-  public List<CommentViewModel> getCommentsByCocktailId(Long id, CustomUserDetails userDetails) {
+  public PagedModel<CommentViewModel> getCommentsByCocktailId(Long id, CustomUserDetails userDetails,
+      Pageable pageable) {
     if (!cocktailRepository.existsById(id)) {
-      throw new ObjectNotFoundException("Cocktail with ID " + id + " not found!");
+      throw new ObjectNotFoundException("cocktail", "Cocktail with ID " + id + " not found!");
     }
 
     Long userId = userDetails != null ? userDetails.getId() : null;
 
-    return commentRepository.findByCocktailId(id)
-        .stream()
+    Page<CommentViewModel> result = commentRepository.findByCocktailId(id, pageable)
         .map(comment ->
-            comment.setCanDelete(userId != null && isOwnerOrAdminOfComment(userId, comment.getId())))
-        .toList();
+            comment.setCanDelete(userId != null && isOwnerOrAdminOfComment(userId, comment.getId())));
+
+    return new PagedModel<>(result);
   }
 
   public CommentViewModel addComment(Long id, AddCommentDto addCommentDto, CustomUserDetails userDetails) {
     CocktailEntity cocktail = cocktailRepository.findById(id)
-        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with ID " + id + " not found!"));
+        .orElseThrow(() -> new ObjectNotFoundException("cocktail", "Cocktail with ID " + id + " not found!"));
 
     CommentEntity newComment = new CommentEntity()
         .setText(addCommentDto.text())
@@ -184,7 +185,7 @@ public class CocktailService {
 
   public void deleteCommentById(Long cocktailId, Long commentId) {
     CommentEntity commentEntity = commentRepository.findById(commentId)
-        .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + commentId + " not found!"));
+        .orElseThrow(() -> new ObjectNotFoundException("cocktail", "Comment with ID " + commentId + " not found!"));
 
     if (!Objects.equals(commentEntity.getCocktail().getId(), cocktailId)) {
       throw new IllegalArgumentException("Comment does not belong to this cocktail.");
@@ -225,13 +226,6 @@ public class CocktailService {
     vm.setVideoId(extractVideoId(vm.getVideoUrl()));
 
     Long userId = userDetails != null ? userDetails.getId() : null;
-
-    List<CommentViewModel> comments = commentRepository.findByCocktailId(vm.getId())
-        .stream()
-        .map(comment ->
-            comment.setCanDelete(userId != null && isOwnerOrAdminOfComment(userId, comment.getId())))
-        .toList();
-    vm.setComments(comments);
 
     vm.setCanDelete(canDeleteCocktail);
     vm.setFavorite(isCocktailFavorite(userId, vm.getId()));

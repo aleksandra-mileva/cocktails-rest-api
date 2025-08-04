@@ -26,9 +26,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
-@CrossOrigin("*")
+@CrossOrigin(
+    origins = "http://localhost:4200",
+    allowCredentials = "true"
+)
 @RestController
 @RequestMapping("/api/cocktails")
 public class CocktailController {
@@ -78,11 +79,12 @@ public class CocktailController {
   }
 
   @GetMapping("/{id}/comments")
-  public List<CommentViewModel> comments(
+  public PagedModel<CommentViewModel> comments(
       @PathVariable Long id,
-      @AuthenticationPrincipal CustomUserDetails userDetails
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      Pageable pageable
   ) {
-    return cocktailService.getCommentsByCocktailId(id, userDetails);
+    return cocktailService.getCommentsByCocktailId(id, userDetails, pageable);
   }
 
   @PostMapping("/{id}/comments")

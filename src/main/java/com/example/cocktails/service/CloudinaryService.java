@@ -13,7 +13,6 @@ import java.util.Map;
 public class CloudinaryService {
 
   private static final String TEMP_FILE = "temp-file";
-  private static final String URL = "url";
   private static final String PUBLIC_ID = "public_id";
 
   private final Cloudinary cloudinary;

@@ -12,23 +12,45 @@ import java.util.List;
 
 public class ExceptionResponseDTO {
 
-  private List<String> messages;
+  private List<FieldError> errors;
 
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
   private LocalDateTime dateTime;
 
+  public static class FieldError {
+    private String field;
+    private String message;
+
+    public FieldError(String field, String message) {
+      this.field = field;
+      this.message = message;
+    }
+
+    public String getField() {
+      return field;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+  }
+
   public ExceptionResponseDTO() {
-    messages = new ArrayList<>();
+    this.errors = new ArrayList<>();
   }
 
-  public List<String> getMessages() {
-    return messages;
+  public void addError(String field, String message) {
+    errors.add(new FieldError(field, message));
   }
 
-  public void setMessages(List<String> messages) {
-    this.messages = messages;
+  public List<FieldError> getErrors() {
+    return errors;
+  }
+
+  public void setErrors(List<FieldError> errors) {
+    this.errors = errors;
   }
 
   public LocalDateTime getDateTime() {

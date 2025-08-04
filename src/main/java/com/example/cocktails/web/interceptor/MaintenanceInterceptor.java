@@ -23,7 +23,7 @@ public class MaintenanceInterceptor implements HandlerInterceptor {
     if (isMaintenanceTime(LocalTime.now())) {
       ExceptionResponseDTO error = new ExceptionResponseDTO();
       error.setDateTime(LocalDateTime.now());
-      error.getMessages().add("Service is under maintenance. Please try again later.");
+      error.addError("maintenance-time", "Service is under maintenance. Please try again later.");
 
       response.setStatus(HttpStatus.SERVICE_UNAVAILABLE.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);

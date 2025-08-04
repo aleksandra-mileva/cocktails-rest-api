@@ -26,7 +26,7 @@ public class UserService {
 
   public UserViewModel getUserInformation(Long id) {
     UserEntity userEntity = this.userRepository.findById(id)
-        .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));
+        .orElseThrow(() -> new ObjectNotFoundException("user", "User with ID " + id + " not found!"));
     List<String> roles = userEntity.getRoles().stream().map(r -> r.getRole().name()).toList();
 
     return new UserViewModel(
@@ -42,7 +42,7 @@ public class UserService {
   @Transactional(noRollbackFor = UsernameChangedException.class)
   public void updateUserProfile(Long id, UserEditDto dto) {
     UserEntity existingUser = userRepository.findById(id)
-        .orElseThrow(() -> new ObjectNotFoundException("User with ID " + id + " not found!"));
+        .orElseThrow(() -> new ObjectNotFoundException("user", "User with ID " + id + " not found!"));
 
     validateProfileUpdate(existingUser, dto);
 
@@ -63,11 +63,11 @@ public class UserService {
   @Transactional
   public boolean addOrRemoveCocktailFromFavorites(Long cocktailId, CustomUserDetails userDetails) {
     UserEntity user = this.userRepository.findByUsername(userDetails.getUsername())
-        .orElseThrow(() -> new ObjectNotFoundException(
+        .orElseThrow(() -> new ObjectNotFoundException("user",
             "User with username " + userDetails.getUsername() + " was not found!"));
 
     CocktailEntity cocktail = cocktailRepository.findById(cocktailId)
-        .orElseThrow(() -> new ObjectNotFoundException("Cocktail with id " + cocktailId + " not found!"));
+        .orElseThrow(() -> new ObjectNotFoundException("cocktail", "Cocktail with id " + cocktailId + " not found!"));
 
     if (!user.getFavorites().contains(cocktail)) {
       user.getFavorites().add(cocktail);

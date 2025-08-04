@@ -28,7 +28,8 @@ public class UserRegisterDto {
   @NotEmpty(message = "Last name cannot be empty.")
   @Size(min = 3, max = 20, message = "Last name length must be between 3 and 20 characters!")
   private String lastName;
-  @NotEmpty(message = "Base URL should be provided.")
+  // Will be used when we start using verification with email
+//  @NotEmpty(message = "Base URL should be provided.")
   private String baseUrl;
 
   public String getFirstName() {

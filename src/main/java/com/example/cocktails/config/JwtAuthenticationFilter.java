@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private void writeError(HttpServletResponse response, int status, String message) throws IOException {
     ExceptionResponseDTO error = new ExceptionResponseDTO();
     error.setDateTime(LocalDateTime.now());
-    error.getMessages().add(message);
+    error.addError("token", message);
 
     response.setStatus(status);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);

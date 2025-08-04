@@ -30,7 +30,6 @@ public interface CocktailMapper {
   @Mapping(target = "author", ignore = true)
   @Mapping(target = "videoId", ignore = true)
   @Mapping(target = "picture", ignore = true)
-  @Mapping(target = "comments", ignore = true)
   @Mapping(target = "canDelete", ignore = true)
   @Mapping(target = "favorite", ignore = true)
   CocktailDetailsViewModel cocktailEntityToDetailsViewModel(CocktailEntity cocktail);
