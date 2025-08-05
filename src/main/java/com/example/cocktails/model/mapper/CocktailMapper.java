@@ -21,7 +21,6 @@ public interface CocktailMapper {
   @Mapping(target = "favoriteUsers", ignore = true)
   CocktailEntity addCocktailDtoToCocktailEntity(AddCocktailDto addCocktailDto);
 
-
   @Mapping(target = "ingredientsRaw", source = "cocktail.ingredients")
   @Mapping(target = "authorFirstName", source = "cocktail.author.firstName")
   @Mapping(target = "authorLastName", source = "cocktail.author.lastName")

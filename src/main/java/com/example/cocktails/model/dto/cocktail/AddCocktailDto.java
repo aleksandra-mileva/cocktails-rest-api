@@ -14,7 +14,7 @@ public record AddCocktailDto(
     @NotEmpty String preparation,
     @NotNull FlavourEnum flavour,
     String videoUrl,
-    TypeNameEnum type,
+    @NotNull TypeNameEnum type,
     @NotNull SpiritNameEnum spirit,
     @NotNull Integer percentAlcohol,
     @NotNull @Positive Integer servings

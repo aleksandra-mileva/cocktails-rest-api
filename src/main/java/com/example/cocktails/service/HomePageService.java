@@ -26,7 +26,7 @@ public class HomePageService {
       message = "Need a non-alcoholic cocktail? This is our today's suggestion for you!";
     } else {
       cocktail = cocktailService.getRandomCocktailByType(TypeNameEnum.ALCOHOLIC);
-      message = "It's party time! These are our today's alcoholic suggestions for you!";
+      message = "It's party time! This is our today's alcoholic suggestion for you!";
     }
 
     return new HomePageDto(cocktail, message);

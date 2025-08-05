@@ -3,6 +3,7 @@ package com.example.cocktails.model.dto.cocktail;
 import com.example.cocktails.model.dto.picture.PictureViewModel;
 import com.example.cocktails.model.entity.enums.FlavourEnum;
 import com.example.cocktails.model.entity.enums.SpiritNameEnum;
+import com.example.cocktails.model.entity.enums.TypeNameEnum;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class CocktailDetailsViewModel {
   private String pictureUrl;
   private Integer percentAlcohol;
   private Integer servings;
+  private TypeNameEnum type;
 
   // Not from DB – set manually
   private List<String> ingredients;
@@ -42,6 +44,7 @@ public class CocktailDetailsViewModel {
       String pictureUrl,
       Integer percentAlcohol,
       Integer servings,
+      TypeNameEnum type,
       PictureViewModel picture
   ) {
     this.id = id;
@@ -56,6 +59,7 @@ public class CocktailDetailsViewModel {
     this.pictureUrl = pictureUrl;
     this.percentAlcohol = percentAlcohol;
     this.servings = servings;
+    this.type = type;
     this.picture = picture;
   }
 
@@ -218,6 +222,15 @@ public class CocktailDetailsViewModel {
 
   public CocktailDetailsViewModel setFavorite(boolean favorite) {
     isFavorite = favorite;
+    return this;
+  }
+
+  public TypeNameEnum getType() {
+    return type;
+  }
+
+  public CocktailDetailsViewModel setType(TypeNameEnum type) {
+    this.type = type;
     return this;
   }
 }

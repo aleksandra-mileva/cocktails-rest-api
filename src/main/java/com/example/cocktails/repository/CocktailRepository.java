@@ -84,6 +84,7 @@ public interface CocktailRepository extends JpaRepository<CocktailEntity, Long>,
         c.picture.url,
         c.percentAlcohol,
         c.servings,
+        c.type,
         new com.example.cocktails.model.dto.picture.PictureViewModel(c.picture.id, c.picture.url)
     )
     FROM CocktailEntity c
