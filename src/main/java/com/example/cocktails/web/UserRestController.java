@@ -45,8 +45,8 @@ public class UserRestController {
 
   @PreAuthorize("#id == authentication.principal.id")
   @PutMapping("/{id}")
-  public void updateUserInformation(@PathVariable Long id, @Valid @RequestBody UserEditDto userEditDto) {
-    userService.updateUserProfile(id, userEditDto);
+  public UserViewModel updateUserInformation(@PathVariable Long id, @Valid @RequestBody UserEditDto userEditDto) {
+    return userService.updateUserProfile(id, userEditDto);
   }
 
   @PreAuthorize("#id == authentication.principal.id")

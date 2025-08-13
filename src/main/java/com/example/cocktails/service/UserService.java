@@ -8,11 +8,14 @@ import com.example.cocktails.model.user.CustomUserDetails;
 import com.example.cocktails.repository.CocktailRepository;
 import com.example.cocktails.repository.UserRepository;
 import com.example.cocktails.web.exception.ObjectNotFoundException;
+import com.example.cocktails.web.exception.UniqueUserException;
 import com.example.cocktails.web.exception.UsernameChangedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -40,7 +43,7 @@ public class UserService {
   }
 
   @Transactional(noRollbackFor = UsernameChangedException.class)
-  public void updateUserProfile(Long id, UserEditDto dto) {
+  public UserViewModel updateUserProfile(Long id, UserEditDto dto) {
     UserEntity existingUser = userRepository.findById(id)
         .orElseThrow(() -> new ObjectNotFoundException("user", "User with ID " + id + " not found!"));
 
@@ -58,6 +61,15 @@ public class UserService {
     if (usernameChanged) {
       throw new UsernameChangedException("Username changed. Please log in again.");
     }
+
+    return new UserViewModel(
+        existingUser.getId(),
+        existingUser.getUsername(),
+        existingUser.getFirstName(),
+        existingUser.getLastName(),
+        existingUser.getEmail(),
+        null
+    );
   }
 
   @Transactional
@@ -83,17 +95,23 @@ public class UserService {
   }
 
   private void validateProfileUpdate(UserEntity existingUser, UserEditDto dto) {
+    Map<String, String> errors = new LinkedHashMap<>();
+
     String newUsername = dto.username();
     String newEmail = dto.email();
 
-    if (!existingUser.getUsername().equalsIgnoreCase(newUsername)
-        && userRepository.existsByUsername(newUsername)) {
-      throw new IllegalArgumentException("This username " + newUsername + " is already taken.");
+    if (!existingUser.getUsername().equalsIgnoreCase(newUsername) &&
+        userRepository.existsByUsername(newUsername)) {
+      errors.put("username", "This username " + newUsername + " is already taken.");
     }
 
-    if (!existingUser.getEmail().equalsIgnoreCase(newEmail)
-        && userRepository.existsByEmail(newEmail)) {
-      throw new IllegalArgumentException("This email " + newEmail + " is already taken.");
+    if (!existingUser.getEmail().equalsIgnoreCase(newEmail) &&
+        userRepository.existsByEmail(newEmail)) {
+      errors.put("email", "This email " + newEmail + " is already taken.");
+    }
+
+    if (!errors.isEmpty()) {
+      throw new UniqueUserException(errors);
     }
   }
 }

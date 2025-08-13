@@ -84,4 +84,14 @@ public class ExceptionsHandler {
 
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
+
+  @ExceptionHandler(UniqueUserException.class)
+  public ResponseEntity<ExceptionResponseDTO> handleUniqueUserException(UniqueUserException ex) {
+    ExceptionResponseDTO response = new ExceptionResponseDTO();
+    response.setDateTime(LocalDateTime.now());
+
+    ex.getFieldsAndMessages().forEach(response::addError);
+
+    return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+  }
 }
