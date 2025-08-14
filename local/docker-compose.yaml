@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: mysql:8.0
@@ -11,3 +13,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - backend
+
+  cocktails:
+    image: milevaaleks/crafty-cocktails:v3
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - CLAUDINARY_API_KEY=478985327646651
+      - CLAUDINARY_API_SECRET=i3CwHZ9gUu8YYHzop8jqco6ErVY
+      - EMAIL_PASSWORD=keys jnos athx ocwl
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
