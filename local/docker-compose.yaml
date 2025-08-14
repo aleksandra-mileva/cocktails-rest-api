@@ -17,7 +17,7 @@ services:
       - backend
 
   cocktails:
-    image: milevaaleks/crafty-cocktails:v3
+    image: milevaaleks/cocktails-rest-api:v1
     depends_on:
       - db
     ports:
