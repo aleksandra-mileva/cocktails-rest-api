@@ -56,7 +56,7 @@ public class AuthService {
     UserEntity newUser = userMapper.userRegisterDtoToUserEntity(userRegisterDto);
     newUser.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
     newUser.addRole(getUserRole());
-    newUser.setAccountVerified(false);
+    newUser.setAccountVerified(true);
     this.userRepository.save(newUser);
 //    sendVerificationMail(this.userRepository.save(newUser), userRegisterDto.getBaseUrl(), preferedLocale);
   }
