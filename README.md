@@ -13,10 +13,7 @@
 - <span>Clone the Rest Api: [Cocktails REST API](https://github.com/aleksandra-mileva/cocktails-rest-api)</span>
 - Make sure you have a MySQL server running.
 - Make sure you have Java 21 installed.
-- Option A: Run the project using IntelliJ or another IDE.
-- Option B (no ide):
-  `./gradlew build`
-  `java -jar build/libs/<your-app-name>-<version>.jar`
+- Run the project using IntelliJ or another IDE.
 
 ##  Functionality
 **<span style="font-size: larger;">For all users</span>**
